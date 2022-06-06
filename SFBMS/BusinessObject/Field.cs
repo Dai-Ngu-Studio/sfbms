@@ -10,19 +10,29 @@ namespace BusinessObject
     [Table("Field")]
     public class Field
     {
+        public Field()
+        {
+            Fields = new HashSet<Field>();
+        }
+
         [Column("id")]
-        public int id { get; set; }
+        public int Id { get; set; }
 
         [Column("name", TypeName = "nvarchar(255)")]
-        public string name { get; set; } = "";
+        public string Name { get; set; } = "";
 
         [Column("description", TypeName = "nvarchar(600)")]
-        public string description { get; set; } = "";
+        public string Description { get; set; } = "";
 
         [Column("price", TypeName = "money")]
-        public decimal price { get; set; }
+        public decimal Price { get; set; }
 
         [Column("category_id")]
-        public int categoryId { get; set; }
+        public int CategoryId { get; set; }
+
+        [ForeignKey("CategoryId")]
+        public Category? Category { get; set; }
+
+        public ICollection<Field> Fields { get; set; }
     }
 }

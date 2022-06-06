@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessObject", "BusinessObject\BusinessObject.csproj", "{6BC60C22-6EB1-4E1E-A859-E78A67CCE91C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessObject", "BusinessObject\BusinessObject.csproj", "{6BC60C22-6EB1-4E1E-A859-E78A67CCE91C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{121A2B8B-E8CA-4CF5-B478-1F3C1F853512}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\DataAccess.csproj", "{121A2B8B-E8CA-4CF5-B478-1F3C1F853512}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFBMS-API", "SFBMS-API\SFBMS-API.csproj", "{9EA8E9AC-CF8B-495D-A319-A51108175CEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFBMS-API", "SFBMS-API\SFBMS-API.csproj", "{9EA8E9AC-CF8B-495D-A319-A51108175CEA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repositories", "Repositories\Repositories.csproj", "{0044D96F-5925-45D6-8736-F5AD72584979}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{9EA8E9AC-CF8B-495D-A319-A51108175CEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EA8E9AC-CF8B-495D-A319-A51108175CEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EA8E9AC-CF8B-495D-A319-A51108175CEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0044D96F-5925-45D6-8736-F5AD72584979}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0044D96F-5925-45D6-8736-F5AD72584979}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0044D96F-5925-45D6-8736-F5AD72584979}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0044D96F-5925-45D6-8736-F5AD72584979}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
