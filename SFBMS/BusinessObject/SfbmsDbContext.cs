@@ -26,6 +26,7 @@ namespace BusinessObject
         public DbSet<Category> Categories { get; set; } = null!;
         public DbSet<Booking> Bookings { get; set; } = null!;
         public DbSet<BookingDetail> BookingDetails { get; set; } = null!;
+        public DbSet<Feedback> Feedbacks { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

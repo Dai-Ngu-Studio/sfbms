@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -13,8 +14,10 @@ namespace BusinessObject
         public Field()
         {
             Fields = new HashSet<Field>();
+            Feedbacks = new HashSet<Feedback>();
         }
 
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("id")]
         public int Id { get; set; }
 
@@ -33,6 +36,10 @@ namespace BusinessObject
         [ForeignKey("CategoryId")]
         public Category? Category { get; set; }
 
+        [Column("number_of_slots")]
+        public int NumberOfSlots { get; set; }
+
         public ICollection<Field> Fields { get; set; }
+        public ICollection<Feedback> Feedbacks { get; set; }
     }
 }

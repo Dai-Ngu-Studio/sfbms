@@ -8,19 +8,11 @@ using System.Threading.Tasks;
 
 namespace BusinessObject
 {
-    public class Booking
+    public class Feedback
     {
-        public Booking()
-        {
-            BookingDetails = new HashSet<BookingDetail>();
-        }
-
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("id")]
         public int Id { get; set; }
-
-        [Column("total_price", TypeName = "money")]
-        public decimal TotalPrice { get; set; }
 
         [Column("user_id")]
         public int UserId { get; set; }
@@ -28,6 +20,20 @@ namespace BusinessObject
         [ForeignKey("UserId")]
         public User? User { get; set; }
 
-        public ICollection<BookingDetail> BookingDetails { get; set; }
+        [Column("user_id")]
+        public int FieldId { get; set; }
+
+        [ForeignKey("FieldId")]
+        public Field? Field { get; set; }
+
+        [Column("title", TypeName = "nvarchar(255)")]
+        public string Title { get; set; } = "";
+
+        [Column("content", TypeName = "nvarchar(800)")]
+        public string Content { get; set; } = "";
+
+        [Column("rating")]
+        public int Rating { get; set; }
+
     }
 }
