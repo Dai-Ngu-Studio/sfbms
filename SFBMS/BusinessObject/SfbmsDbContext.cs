@@ -9,6 +9,10 @@ namespace BusinessObject
         {
         }
 
+        public SfbmsDbContext()
+        {
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //optionsBuilder.UseSqlServer(Environment.GetEnvironmentVariable("SFBMSDB_CNS")!);
