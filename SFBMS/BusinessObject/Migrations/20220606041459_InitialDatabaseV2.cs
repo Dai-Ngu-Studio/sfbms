@@ -119,14 +119,12 @@ namespace BusinessObject.Migrations
                         name: "FK_BookingDetails_Field_field_id",
                         column: x => x.field_id,
                         principalTable: "Field",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_BookingDetails_Users_user_id",
                         column: x => x.user_id,
                         principalTable: "Users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "id");
                 });
 
             migrationBuilder.CreateIndex(
