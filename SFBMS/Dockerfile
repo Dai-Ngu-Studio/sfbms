@@ -8,12 +8,14 @@ EXPOSE 443
 COPY *.sln ./
 COPY BusinessObject/*.csproj ./BusinessObject/
 COPY DataAccess/*.csproj ./DataAccess/
+COPY Repositories/*.csproj ./Repositories/
 COPY SFBMS-API/*.csproj ./SFBMS-API/
 RUN dotnet restore
 
 # Copy everything else and build
 COPY BusinessObject/. ./BusinessObject/
 COPY DataAccess/. ./DataAccess/
+COPY Repositories/. ./Repositories/
 COPY SFBMS-API/. ./SFBMS-API/
 RUN dotnet publish -c Release -o out
 
