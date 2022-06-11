@@ -11,6 +11,8 @@ services:
       - db
     environment:
       SFBMSDB_CNS: "server=db,1433;database=SfbmsDb;uid=sa;pwd=QWEasd123;"
+      FIREBASE_SECRET: ${FIREBASE_SECRET}
+      GOOGLE_APPLICATION_CREDENTIALS: "./sfbms-48a15-firebase-adminsdk-dt153-060577b48c.json"
   db:
     image: "mcr.microsoft.com/mssql/server:2019-CU15-ubuntu-20.04"
     user: root

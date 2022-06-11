@@ -25,4 +25,4 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 COPY --from=build-env /app/out .
-CMD dotnet SFBMS-API.dll
+CMD echo "$FIREBASE_SECRET" > sfbms-48a15-firebase-adminsdk-dt153-060577b48c.json && dotnet SFBMS-API.dll && fg
