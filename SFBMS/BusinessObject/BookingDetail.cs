@@ -15,7 +15,7 @@ namespace BusinessObject
         public int Id { get; set; }
 
         [Column("booking_id")]
-        public int BookingId { get; set; }
+        public int? BookingId { get; set; }
 
         [ForeignKey("BookingId")]
         public Booking? Booking { get; set; }
@@ -27,13 +27,13 @@ namespace BusinessObject
         public DateTime EndTime { get; set; }
 
         [Column("field_id")]
-        public int FieldId { get; set; }
+        public int? FieldId { get; set; }
 
         [ForeignKey("FieldId")]
         public Field? Field { get; set; }
 
-        [Column("user_id")]
-        public int UserId { get; set; }
+        [Column("user_id", TypeName = "varchar(128)")]
+        public string? UserId { get; set; } = null!;
 
         [ForeignKey("UserId")]
         public User? User { get; set; }

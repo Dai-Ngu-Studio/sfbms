@@ -15,9 +15,9 @@ namespace BusinessObject
         public int Id { get; set; }
 
         [Column("field_id")]
-        public int FieldId { get; set; }
+        public int? FieldId { get; set; }
 
-        [ForeignKey("fieldId")]
+        [ForeignKey("FieldId")]
         public Field? Field { get; set; }
 
         [Column("start_time", TypeName = "datetime2(7)")]

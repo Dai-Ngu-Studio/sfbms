@@ -35,8 +35,8 @@ namespace BusinessObject.Migrations
                         .HasColumnType("money")
                         .HasColumnName("total_price");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
+                    b.Property<string>("UserId")
+                        .HasColumnType("varchar(128)")
                         .HasColumnName("user_id");
 
                     b.HasKey("Id");
@@ -55,18 +55,15 @@ namespace BusinessObject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("BookingId")
+                    b.Property<int?>("BookingId")
                         .HasColumnType("int")
                         .HasColumnName("booking_id");
-
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2(7)")
                         .HasColumnName("end_time");
 
-                    b.Property<int>("FieldId")
+                    b.Property<int?>("FieldId")
                         .HasColumnType("int")
                         .HasColumnName("field_id");
 
@@ -82,15 +79,13 @@ namespace BusinessObject.Migrations
                         .HasColumnType("datetime2(7)")
                         .HasColumnName("start_time");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
+                    b.Property<string>("UserId")
+                        .HasColumnType("varchar(128)")
                         .HasColumnName("user_id");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BookingId");
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("FieldId");
 
@@ -132,10 +127,9 @@ namespace BusinessObject.Migrations
                         .HasColumnType("nvarchar(800)")
                         .HasColumnName("content");
 
-                    b.Property<int>("FieldId")
-                        .ValueGeneratedOnUpdateSometimes()
+                    b.Property<int?>("FieldId")
                         .HasColumnType("int")
-                        .HasColumnName("user_id");
+                        .HasColumnName("field_id");
 
                     b.Property<int>("Rating")
                         .HasColumnType("int")
@@ -146,9 +140,8 @@ namespace BusinessObject.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("title");
 
-                    b.Property<int>("UserId")
-                        .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("int")
+                    b.Property<string>("UserId")
+                        .HasColumnType("varchar(128)")
                         .HasColumnName("user_id");
 
                     b.HasKey("Id");
@@ -169,7 +162,7 @@ namespace BusinessObject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("CategoryId")
+                    b.Property<int?>("CategoryId")
                         .HasColumnType("int")
                         .HasColumnName("category_id");
 
@@ -177,9 +170,6 @@ namespace BusinessObject.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(600)")
                         .HasColumnName("description");
-
-                    b.Property<int?>("FieldId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -198,8 +188,6 @@ namespace BusinessObject.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("FieldId");
-
                     b.ToTable("Field");
                 });
 
@@ -216,7 +204,7 @@ namespace BusinessObject.Migrations
                         .HasColumnType("datetime2(7)")
                         .HasColumnName("end_time");
 
-                    b.Property<int>("FieldId")
+                    b.Property<int?>("FieldId")
                         .HasColumnType("int")
                         .HasColumnName("field_id");
 
@@ -228,24 +216,18 @@ namespace BusinessObject.Migrations
                         .HasColumnType("int")
                         .HasColumnName("status");
 
-                    b.Property<int?>("fieldId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("fieldId");
+                    b.HasIndex("FieldId");
 
                     b.ToTable("Slots");
                 });
 
             modelBuilder.Entity("BusinessObject.User", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(128)")
                         .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -275,9 +257,7 @@ namespace BusinessObject.Migrations
                 {
                     b.HasOne("BusinessObject.User", "User")
                         .WithMany("Bookings")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -286,23 +266,15 @@ namespace BusinessObject.Migrations
                 {
                     b.HasOne("BusinessObject.Booking", "Booking")
                         .WithMany("BookingDetails")
-                        .HasForeignKey("BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BusinessObject.Category", null)
-                        .WithMany("BookingDetails")
-                        .HasForeignKey("CategoryId");
+                        .HasForeignKey("BookingId");
 
                     b.HasOne("BusinessObject.Field", "Field")
-                        .WithMany()
-                        .HasForeignKey("FieldId")
-                        .IsRequired();
+                        .WithMany("BookingDetails")
+                        .HasForeignKey("FieldId");
 
                     b.HasOne("BusinessObject.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Booking");
 
@@ -315,15 +287,11 @@ namespace BusinessObject.Migrations
                 {
                     b.HasOne("BusinessObject.Field", "Field")
                         .WithMany("Feedbacks")
-                        .HasForeignKey("FieldId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("FieldId");
 
                     b.HasOne("BusinessObject.User", "User")
                         .WithMany("Feedbacks")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Field");
 
@@ -334,13 +302,7 @@ namespace BusinessObject.Migrations
                 {
                     b.HasOne("BusinessObject.Category", "Category")
                         .WithMany("Fields")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BusinessObject.Field", null)
-                        .WithMany("Fields")
-                        .HasForeignKey("FieldId");
+                        .HasForeignKey("CategoryId");
 
                     b.Navigation("Category");
                 });
@@ -348,8 +310,8 @@ namespace BusinessObject.Migrations
             modelBuilder.Entity("BusinessObject.Slot", b =>
                 {
                     b.HasOne("BusinessObject.Field", "Field")
-                        .WithMany()
-                        .HasForeignKey("fieldId");
+                        .WithMany("Slots")
+                        .HasForeignKey("FieldId");
 
                     b.Navigation("Field");
                 });
@@ -361,16 +323,16 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Category", b =>
                 {
-                    b.Navigation("BookingDetails");
-
                     b.Navigation("Fields");
                 });
 
             modelBuilder.Entity("BusinessObject.Field", b =>
                 {
+                    b.Navigation("BookingDetails");
+
                     b.Navigation("Feedbacks");
 
-                    b.Navigation("Fields");
+                    b.Navigation("Slots");
                 });
 
             modelBuilder.Entity("BusinessObject.User", b =>

@@ -14,14 +14,14 @@ namespace BusinessObject
         [Column("id")]
         public int Id { get; set; }
 
-        [Column("user_id")]
-        public int UserId { get; set; }
+        [Column("user_id", TypeName = "varchar(128)")]
+        public string? UserId { get; set; }
 
         [ForeignKey("UserId")]
         public User? User { get; set; }
 
-        [Column("user_id")]
-        public int FieldId { get; set; }
+        [Column("field_id")]
+        public int? FieldId { get; set; }
 
         [ForeignKey("FieldId")]
         public Field? Field { get; set; }

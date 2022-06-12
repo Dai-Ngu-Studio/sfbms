@@ -22,8 +22,8 @@ namespace BusinessObject
         [Column("total_price", TypeName = "money")]
         public decimal TotalPrice { get; set; }
 
-        [Column("user_id")]
-        public int UserId { get; set; }
+        [Column("user_id", TypeName = "varchar(128)")]
+        public string? UserId { get; set; }
 
         [ForeignKey("UserId")]
         public User? User { get; set; }

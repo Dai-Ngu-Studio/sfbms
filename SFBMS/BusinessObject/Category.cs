@@ -13,7 +13,6 @@ namespace BusinessObject
         public Category()
         {
             Fields = new HashSet<Field>();
-            BookingDetails = new HashSet<BookingDetail>();
         }
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -24,7 +23,5 @@ namespace BusinessObject
         public string Name { get; set; } = "";
 
         public HashSet<Field> Fields { get; set; }
-
-        public ICollection<BookingDetail> BookingDetails { get; set; }
     }
 }

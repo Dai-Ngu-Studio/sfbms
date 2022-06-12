@@ -13,8 +13,9 @@ namespace BusinessObject
     {
         public Field()
         {
-            Fields = new HashSet<Field>();
+            Slots = new HashSet<Slot>();
             Feedbacks = new HashSet<Feedback>();
+            BookingDetails = new HashSet<BookingDetail>();
         }
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -31,7 +32,7 @@ namespace BusinessObject
         public decimal Price { get; set; }
 
         [Column("category_id")]
-        public int CategoryId { get; set; }
+        public int? CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]
         public Category? Category { get; set; }
@@ -39,7 +40,8 @@ namespace BusinessObject
         [Column("number_of_slots")]
         public int NumberOfSlots { get; set; }
 
-        public ICollection<Field> Fields { get; set; }
+        public ICollection<Slot> Slots { get; set; }
         public ICollection<Feedback> Feedbacks { get; set; }
+        public ICollection<BookingDetail> BookingDetails { get; set; }
     }
 }
