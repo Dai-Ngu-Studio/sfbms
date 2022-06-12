@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BusinessObject;
+using FirebaseAdmin.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Repositories.Interfaces;
@@ -19,13 +21,50 @@ namespace SFBMS_API.Controllers
 
         [HttpPost("login")]
         //[Authorize]
-        public async Task<ActionResult> Login([FromHeader] string? fcmToken)
+        public async Task<ActionResult> Login()
         {
             string? uid = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (uid != null)
             {
+                User? user = await userRepository.Get(uid);
+                if (user != null)
+                {
+                    try
+                    {
+                        UserRecord? userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+                        bool isUserRecordExisted = userRecord != null;
+                        return Ok(user);
+                    }
+                    catch (Exception e)
+                    {
+                        return BadRequest(e.StackTrace);
+                    }
+                }
+                else // user is null
+                {
+                    try
+                    {
+                        UserRecord? userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+                        string? name = userRecord?.DisplayName.Substring(0, 255);
+                        string? email = userRecord?.Email;
+                        User newUser = new User
+                        {
+                            Id = uid,
+                            Name = name ?? uid,
+                            IsAdmin = 0,
+                            Email = email ?? uid,
+                            Password = "",
+                        };
+                        await userRepository.Add(newUser);
+                        return Ok(newUser);
+                    }
+                    catch (Exception e)
+                    {
+                        return BadRequest(e.StackTrace);
+                    }
+                }
             }
-            return Ok();
+            return Unauthorized();
         }
     }
 }
