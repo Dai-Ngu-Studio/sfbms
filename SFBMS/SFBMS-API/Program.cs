@@ -2,8 +2,11 @@ using BusinessObject;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Repositories;
 using Repositories.Interfaces;
 using System.Text.Json.Serialization;
@@ -32,6 +35,29 @@ builder.Services.AddCors();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+static IEdmModel GetEdmModel()
+{
+    var modelBuilder = new ODataConventionModelBuilder();
+    modelBuilder.EntitySet<User>("Users").EntityType.HasKey(x => x.Id);
+    modelBuilder.EntitySet<Field>("Fields").EntityType.HasKey(x => x.Id);
+    modelBuilder.EntitySet<Slot>("Slots").EntityType.HasKey(x => x.Id);
+    modelBuilder.EntitySet<Category>("Categories").EntityType.HasKey(x => x.Id);
+    modelBuilder.EntitySet<Booking>("Bookings").EntityType.HasKey(x => x.Id);
+    modelBuilder.EntitySet<BookingDetail>("BookingDetails").EntityType.HasKey(x => x.Id);
+    modelBuilder.EntitySet<Feedback>("Feedbacks").EntityType.HasKey(x => x.Id);
+    return modelBuilder.GetEdmModel();
+}
+
+builder.Services.AddControllers().AddOData(option =>
+option
+.Select()
+.Filter()
+.Count()
+.OrderBy()
+.Expand()
+.SetMaxTop(100)
+.AddRouteComponents("odata", GetEdmModel()));
 
 FirebaseApp.Create(new AppOptions()
 {
@@ -76,6 +102,10 @@ app.UseCors(options =>
 {
     options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
 });
+
+app.UseRouting();
+
+app.UseODataBatching();
 
 app.UseAuthentication();
 app.UseAuthorization();
