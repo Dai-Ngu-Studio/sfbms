@@ -86,11 +86,11 @@ using (var context = scope.ServiceProvider.GetService<SfbmsDbContext>())
     context!.Database.Migrate();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 app.Use(async (context, next) =>
 {
