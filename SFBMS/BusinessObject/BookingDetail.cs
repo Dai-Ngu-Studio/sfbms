@@ -38,5 +38,8 @@ namespace BusinessObject
 
         [Column("price", TypeName = "money")]
         public decimal Price { get; set; }
+
+        [Column("status")]
+        public int Status { get; set; }
     }
 }
