@@ -23,5 +23,8 @@ namespace BusinessObject
 
         [Column("status")]
         public int Status { get; set; }
+
+        [Column("slot_number")]
+        public int SlotNumber { get; set; }
     }
 }
