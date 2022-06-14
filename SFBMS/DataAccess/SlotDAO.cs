@@ -32,11 +32,20 @@ namespace DataAccess
             return list;
         }
 
-        public async Task<Slot?> Get(int id)
+        public async Task<Slot?> Get(int? id)
         {
             var db = new SfbmsDbContext();
             Slot? obj = await db.Slots.FirstOrDefaultAsync(x => x.Id == id);
             return obj;
+        }
+
+        public async Task<int> CountFieldSlots(int? fieldId)
+        {
+            var db = new SfbmsDbContext();
+            int fieldSlots = await db.Slots
+                .Where(x => x.FieldId == fieldId)
+                .CountAsync();
+            return fieldSlots;
         }
 
         public async Task Add(Slot obj)
@@ -53,11 +62,9 @@ namespace DataAccess
             await db.SaveChangesAsync();
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(Slot obj)
         {
             var db = new SfbmsDbContext();
-            Slot obj = new Slot { Id = id };
-            db.Slots.Attach(obj);
             db.Slots.Remove(obj);
             await db.SaveChangesAsync();
         }

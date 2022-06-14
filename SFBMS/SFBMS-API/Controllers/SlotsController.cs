@@ -12,10 +12,12 @@ namespace SFBMS_API.Controllers
     public class SlotsController : ODataController
     {
         private readonly ISlotRepository slotRepository;
+        private readonly IFieldRepository fieldRepository;
 
-        public SlotsController(ISlotRepository _slotRepository)
+        public SlotsController(ISlotRepository _slotRepository, IFieldRepository _fieldRepository)
         {
             slotRepository = _slotRepository;
+            fieldRepository = _fieldRepository;
         }
 
         [HttpGet]
@@ -27,23 +29,50 @@ namespace SFBMS_API.Controllers
 
         [EnableQuery]
         [HttpGet("{key}")]
-        public async Task<ActionResult<Slot>> GetSingle([FromODataUri] int key)
+        public async Task<ActionResult<Slot>> GetSlot(int key)
         {
             var obj = await slotRepository.Get(key);
             if (obj == null)
             {
-                return NotFound();
+                return NotFound("Slot not found");
             }
             return Ok(obj);
         }
 
         [HttpPost]
         public async Task<ActionResult<Slot>> Post(Slot obj)
-        {
+        {    
+            var field = await fieldRepository.Get(obj.FieldId);
+            if (field == null)
+            {
+                return NotFound("Field not found");
+            }
+
             try
             {
-                await slotRepository.Add(obj);
-                return Created(obj);
+                Slot slot = new Slot
+                {
+                    FieldId = field.Id,
+                    StartTime = obj.StartTime,
+                    EndTime = obj.EndTime,  
+                    Status = obj.Status,
+                };
+                await slotRepository.Add(slot);
+
+                if (slot != null)
+                {
+                    Field _field = new Field
+                    {
+                        Id = field.Id,
+                        Name = field.Name,
+                        Description = field.Description,
+                        Price = field.Price,
+                        CategoryId = field.CategoryId,
+                        NumberOfSlots = field.NumberOfSlots + 1,
+                    };
+                    await fieldRepository.Update(_field);
+                }
+                return Created(slot);
             }
             catch
             {
@@ -58,15 +87,25 @@ namespace SFBMS_API.Controllers
         [HttpPut("{key}")]
         public async Task<ActionResult<Slot>> Put(int key, Slot obj)
         {
-            if (key != obj.Id)
+            var currentSlot = await slotRepository.Get(key);
+            if (currentSlot == null)
             {
-                return BadRequest();
+                return NotFound("Slot not found");
             }
 
             try
             {
-                await slotRepository.Update(obj);
-                return Ok(obj);
+                Slot slot = new Slot
+                {
+                    Id = currentSlot.Id,
+                    FieldId = obj.FieldId == null ? currentSlot.FieldId : obj.FieldId,
+                    StartTime = obj.StartTime == DateTime.MinValue ? currentSlot.StartTime : obj.StartTime,
+                    EndTime = obj.EndTime == DateTime.MinValue ? currentSlot.EndTime : obj.EndTime,
+                    Status = obj.Status == 0 ? currentSlot.Status : obj.Status,
+                };
+
+                await slotRepository.Update(slot);
+                return Updated(slot);
             }
             catch
             {
@@ -81,9 +120,32 @@ namespace SFBMS_API.Controllers
         [HttpDelete("{key}")]
         public async Task<ActionResult<Slot>> Delete(int key)
         {
+            var slot = await slotRepository.Get(key);
+            if (slot == null)
+            {
+                return NotFound("Slot not found");
+            }
+
             try
             {
-                await slotRepository.Delete(key);
+                var field = await fieldRepository.Get(slot.FieldId);
+                await slotRepository.Delete(slot);
+
+                if (field == null)
+                {
+                    return NotFound("Field not found");
+                }
+                Field _field = new Field
+                {
+                    Id = field.Id,
+                    Name = field.Name,
+                    Description = field.Description,
+                    Price = field.Price,
+                    CategoryId = field.CategoryId,
+                    NumberOfSlots = field.NumberOfSlots - 1,
+                };
+                await fieldRepository.Update(_field);
+               
                 return NoContent();
             }
             catch

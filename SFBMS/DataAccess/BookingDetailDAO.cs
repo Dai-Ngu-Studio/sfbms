@@ -24,19 +24,30 @@ namespace DataAccess
             }
         }
 
-        public async Task<List<BookingDetail>> GetList()
+        public async Task<List<BookingDetail>> GetList(string uid)
         {
             var db = new SfbmsDbContext();
             List<BookingDetail>? list = null;
-            list = await db.BookingDetails.ToListAsync();
+            list = await db.BookingDetails
+                .Where(x => x.UserId == uid)
+                .ToListAsync();
             return list;
         }
 
-        public async Task<BookingDetail?> Get(int id)
+        public async Task<BookingDetail?> Get(int? id, string uid)
         {
             var db = new SfbmsDbContext();
-            BookingDetail? obj = await db.BookingDetails.FirstOrDefaultAsync(x => x.Id == id);
+            BookingDetail? obj = await db.BookingDetails.FirstOrDefaultAsync(x => x.Id == id && x.UserId == uid);
             return obj;
+        }
+
+        public async Task<int> CountBookingDetails(int? bookingId)
+        {
+            var db = new SfbmsDbContext();
+            int userBookingCount = await db.BookingDetails
+                .Where(x => x.BookingId == bookingId)
+                .CountAsync();
+            return userBookingCount;
         }
 
         public async Task Add(BookingDetail obj)
@@ -53,11 +64,9 @@ namespace DataAccess
             await db.SaveChangesAsync();
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(BookingDetail obj)
         {
             var db = new SfbmsDbContext();
-            BookingDetail obj = new BookingDetail { Id = id };
-            db.BookingDetails.Attach(obj);
             db.BookingDetails.Remove(obj);
             await db.SaveChangesAsync();
         }

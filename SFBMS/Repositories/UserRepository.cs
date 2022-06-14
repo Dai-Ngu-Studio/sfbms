@@ -10,6 +10,6 @@ namespace Repositories
         public Task<List<User>> GetList() => UserDAO.Instance.GetList();
         public Task Add(User obj) => UserDAO.Instance.Add(obj);
         public Task Update(User obj) => UserDAO.Instance.Update(obj);
-        public Task Delete(string id) => UserDAO.Instance.Delete(id);
+        public Task Delete(User obj) => UserDAO.Instance.Delete(obj);
     }
 }

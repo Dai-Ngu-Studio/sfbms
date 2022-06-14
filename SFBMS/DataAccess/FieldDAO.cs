@@ -32,7 +32,7 @@ namespace DataAccess
             return list;
         }
 
-        public async Task<Field?> Get(int id)
+        public async Task<Field?> Get(int? id)
         {
             var db = new SfbmsDbContext();
             Field? obj = await db.Fields.FirstOrDefaultAsync(x => x.Id == id);
@@ -53,11 +53,9 @@ namespace DataAccess
             await db.SaveChangesAsync();
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(Field obj)
         {
             var db = new SfbmsDbContext();
-            Field obj = new Field { Id = id };
-            db.Fields.Attach(obj);
             db.Fields.Remove(obj);
             await db.SaveChangesAsync();
         }

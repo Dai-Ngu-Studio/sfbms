@@ -35,8 +35,8 @@ namespace BusinessObject
         [Column("number_of_slots")]
         public int NumberOfSlots { get; set; }
 
-        public ICollection<Slot> Slots { get; set; }
-        public ICollection<Feedback> Feedbacks { get; set; }
-        public ICollection<BookingDetail> BookingDetails { get; set; }
+        public ICollection<Slot>? Slots { get; set; }
+        public ICollection<Feedback>? Feedbacks { get; set; }
+        public ICollection<BookingDetail>? BookingDetails { get; set; }
     }
 }

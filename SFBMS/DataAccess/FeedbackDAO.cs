@@ -24,18 +24,20 @@ namespace DataAccess
             }
         }
 
-        public async Task<List<Feedback>> GetList()
+        public async Task<List<Feedback>> GetList(string uid)
         {
             var db = new SfbmsDbContext();
             List<Feedback>? list = null;
-            list = await db.Feedbacks.ToListAsync();
+            list = await db.Feedbacks
+                .Where(x => x.UserId == uid)
+                .ToListAsync();
             return list;
         }
 
-        public async Task<Feedback?> Get(int id)
+        public async Task<Feedback?> Get(int? id, string uid)
         {
             var db = new SfbmsDbContext();
-            Feedback? obj = await db.Feedbacks.FirstOrDefaultAsync(x => x.Id == id);
+            Feedback? obj = await db.Feedbacks.FirstOrDefaultAsync(x => x.Id == id && x.UserId == uid);
             return obj;
         }
 
@@ -53,11 +55,9 @@ namespace DataAccess
             await db.SaveChangesAsync();
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(Feedback obj)
         {
             var db = new SfbmsDbContext();
-            Feedback obj = new Feedback { Id = id };
-            db.Feedbacks.Attach(obj);
             db.Feedbacks.Remove(obj);
             await db.SaveChangesAsync();
         }

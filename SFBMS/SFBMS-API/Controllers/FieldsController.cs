@@ -12,10 +12,14 @@ namespace SFBMS_API.Controllers
     public class FieldsController : ODataController
     {
         private readonly IFieldRepository fieldRepository;
+        private readonly ICategoryRepository categoryRepository;
+        private readonly ISlotRepository slotRepository;
 
-        public FieldsController(IFieldRepository _fieldRepository)
+        public FieldsController(IFieldRepository _fieldRepository, ICategoryRepository _categoryRepository, ISlotRepository _slotRepository)
         {
             fieldRepository = _fieldRepository;
+            categoryRepository = _categoryRepository;
+            slotRepository = _slotRepository;
         }
 
         [HttpGet]
@@ -27,12 +31,12 @@ namespace SFBMS_API.Controllers
 
         [EnableQuery]
         [HttpGet("{key}")]
-        public async Task<ActionResult<Field>> GetSingle([FromODataUri] int key)
+        public async Task<ActionResult<Field>> GetField(int key)
         {
             var obj = await fieldRepository.Get(key);
             if (obj == null)
             {
-                return NotFound();
+                return NotFound("Field not found");
             }
             return Ok(obj);
         }
@@ -40,10 +44,53 @@ namespace SFBMS_API.Controllers
         [HttpPost]
         public async Task<ActionResult<Field>> Post(Field obj)
         {
+            var category = await categoryRepository.Get(obj.CategoryId);
+            if (category == null)
+            {
+                return NotFound("Category not found");
+            }
+
+
             try
             {
-                await fieldRepository.Add(obj);
-                return Created(obj);
+                Field field = new Field
+                {
+                    CategoryId = obj.CategoryId,
+                    Name = obj.Name,
+                    Description = obj.Description,
+                    Price = obj.Price < 0 ? 10000 : obj.Price,
+                    NumberOfSlots = 0
+                };
+
+                await fieldRepository.Add(field);
+                if (obj.Slots?.Count > 0)
+                {
+                    foreach (var item in obj.Slots)
+                    {
+                        Slot slot = new Slot
+                        {
+                            FieldId = field.Id,
+                            StartTime = item.StartTime,
+                            EndTime = item.EndTime,
+                            Status = item.Status,
+                        };
+                        await slotRepository.Add(slot);                      
+                    }
+                    int fieldSlots = await slotRepository.CountFieldSlots(field.Id);
+                    Field _field = new Field
+                    {
+                        Id = field.Id,
+                        CategoryId = field.CategoryId,
+                        Name = field.Name,
+                        Description = field.Description,
+                        Price = field.Price,
+                        NumberOfSlots = fieldSlots
+                    };
+                    await fieldRepository.Update(_field);
+                    return Created(_field);
+                }
+
+                return Created(field);
             }
             catch
             {
@@ -58,15 +105,26 @@ namespace SFBMS_API.Controllers
         [HttpPut("{key}")]
         public async Task<ActionResult<Field>> Put(int key, Field obj)
         {
-            if (key != obj.Id)
+            var currentField = await fieldRepository.Get(key);
+            if (currentField == null)
             {
-                return BadRequest();
+                return NotFound("Field not found");
             }
 
             try
             {
-                await fieldRepository.Update(obj);
-                return Ok(obj);
+                Field field = new Field
+                {
+                    Id = currentField.Id,
+                    CategoryId = obj.CategoryId == null ? currentField.CategoryId : obj.CategoryId,
+                    Name = obj.Name == null ? currentField.Name : obj.Name,
+                    Description = obj.Description == null ? currentField.Description : obj.Description, 
+                    Price = obj.Price <= 0 ? currentField.Price : obj.Price,
+                    NumberOfSlots = currentField.NumberOfSlots,
+                };
+
+                await fieldRepository.Update(field);
+                return Updated(obj);
             }
             catch
             {
@@ -81,9 +139,20 @@ namespace SFBMS_API.Controllers
         [HttpDelete("{key}")]
         public async Task<ActionResult<Field>> Delete(int key)
         {
+            var field = await fieldRepository.Get(key);
+            if (field == null)
+            {
+                return NotFound("Field not found");
+            }
+            int fieldSlots = await slotRepository.CountFieldSlots(key);
+            if (fieldSlots > 0)
+            {
+                return BadRequest("Please delete all slots from this field before attempting to delete");
+            }
+
             try
             {
-                await fieldRepository.Delete(key);
+                await fieldRepository.Delete(field);
                 return NoContent();
             }
             catch

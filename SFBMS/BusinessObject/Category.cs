@@ -17,6 +17,6 @@ namespace BusinessObject
         [Column("name", TypeName = "nvarchar(255)")]
         public string Name { get; set; } = "";
 
-        public HashSet<Field> Fields { get; set; }
+        public HashSet<Field>? Fields { get; set; }
     }
 }

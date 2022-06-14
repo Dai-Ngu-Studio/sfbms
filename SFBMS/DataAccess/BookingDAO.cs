@@ -24,18 +24,20 @@ namespace DataAccess
             }
         }
 
-        public async Task<List<Booking>> GetList()
+        public async Task<List<Booking>> GetList(string uid)
         {
             var db = new SfbmsDbContext();
             List<Booking>? list = null;
-            list = await db.Bookings.ToListAsync();
+            list = await db.Bookings
+                .Where(x => x.UserId == uid)
+                .ToListAsync();
             return list;
         }
 
-        public async Task<Booking?> Get(int id)
+        public async Task<Booking?> Get(int? id, string uid)
         {
             var db = new SfbmsDbContext();
-            Booking? obj = await db.Bookings.FirstOrDefaultAsync(x => x.Id == id);
+            Booking? obj = await db.Bookings.FirstOrDefaultAsync(x => x.Id == id && x.UserId == uid);
             return obj;
         }
 
@@ -53,11 +55,9 @@ namespace DataAccess
             await db.SaveChangesAsync();
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(Booking obj)
         {
             var db = new SfbmsDbContext();
-            Booking obj = new Booking { Id = id };
-            db.Bookings.Attach(obj);
             db.Bookings.Remove(obj);
             await db.SaveChangesAsync();
         }

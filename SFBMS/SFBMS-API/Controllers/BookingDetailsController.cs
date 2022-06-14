@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Repositories.Interfaces;
+using System.Security.Claims;
 
 namespace SFBMS_API.Controllers
 {
@@ -22,14 +23,14 @@ namespace SFBMS_API.Controllers
         [EnableQuery(MaxExpansionDepth = 5)]
         public async Task<ActionResult<List<BookingDetail>>> Get()
         {
-            return Ok(await bookingDetailRepository.GetList());
+            return Ok(await bookingDetailRepository.GetList(GetCurrentUID()));
         }
 
         [EnableQuery]
         [HttpGet("{key}")]
-        public async Task<ActionResult<BookingDetail>> GetSingle([FromODataUri] int key)
+        public async Task<ActionResult<BookingDetail>> GetBookingDetail(int key)
         {
-            var obj = await bookingDetailRepository.Get(key);
+            var obj = await bookingDetailRepository.Get(key, GetCurrentUID());
             if (obj == null)
             {
                 return NotFound();
@@ -47,7 +48,7 @@ namespace SFBMS_API.Controllers
             }
             catch
             {
-                if (await bookingDetailRepository.Get(obj.Id) != null)
+                if (await bookingDetailRepository.Get(obj.Id, GetCurrentUID()) != null)
                 {
                     return Conflict();
                 }
@@ -70,7 +71,7 @@ namespace SFBMS_API.Controllers
             }
             catch
             {
-                if (await bookingDetailRepository.Get(obj.Id) == null)
+                if (await bookingDetailRepository.Get(obj.Id, GetCurrentUID()) == null)
                 {
                     return NotFound();
                 }
@@ -81,19 +82,30 @@ namespace SFBMS_API.Controllers
         [HttpDelete("{key}")]
         public async Task<ActionResult<BookingDetail>> Delete(int key)
         {
+            var obj = await bookingDetailRepository.Get(key, GetCurrentUID());
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
             try
             {
-                await bookingDetailRepository.Delete(key);
+                await bookingDetailRepository.Delete(obj);
                 return NoContent();
             }
             catch
             {
-                if (await bookingDetailRepository.Get(key) == null)
+                if (await bookingDetailRepository.Get(key, GetCurrentUID()) == null)
                 {
                     return NotFound();
                 }
                 return BadRequest();
             }
+        }
+
+        private string GetCurrentUID()
+        {
+            return User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
     }
 }

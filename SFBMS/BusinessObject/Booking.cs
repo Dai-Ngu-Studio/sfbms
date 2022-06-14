@@ -23,6 +23,6 @@ namespace BusinessObject
         [ForeignKey("UserId")]
         public User? User { get; set; }
 
-        public ICollection<BookingDetail> BookingDetails { get; set; }
+        public ICollection<BookingDetail>? BookingDetails { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BusinessObject;
 using FirebaseAdmin.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories.Interfaces;
 using System.Security.Claims;
@@ -18,7 +19,7 @@ namespace SFBMS_API.Controllers
         }
 
         [HttpPost("login")]
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult> Login()
         {
             string? uid = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -42,13 +43,13 @@ namespace SFBMS_API.Controllers
                 {
                     try
                     {
-                        UserRecord? userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
-                        string? name = userRecord?.DisplayName.Substring(0, 255);
+                        UserRecord? userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);                       
                         string? email = userRecord?.Email;
+                        string? name = String.IsNullOrWhiteSpace(userRecord?.DisplayName) ? email : userRecord?.DisplayName.Substring(0, 255);
                         User newUser = new User
                         {
                             Id = uid,
-                            Name = name ?? uid,
+                            Name = name,
                             IsAdmin = 0,
                             Email = email ?? uid,
                             Password = "",

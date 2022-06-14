@@ -53,11 +53,9 @@ namespace DataAccess
             await db.SaveChangesAsync();
         }
 
-        public async Task Delete(string id)
+        public async Task Delete(User obj)
         {
             var db = new SfbmsDbContext();
-            User obj = new User { Id = id };
-            db.Users.Attach(obj);
             db.Users.Remove(obj);
             await db.SaveChangesAsync();
         }

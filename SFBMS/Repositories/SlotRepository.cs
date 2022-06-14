@@ -6,10 +6,11 @@ namespace Repositories
 {
     public class SlotRepository : ISlotRepository
     {
-        public Task<Slot?> Get(int id) => SlotDAO.Instance.Get(id);
+        public Task<Slot?> Get(int? id) => SlotDAO.Instance.Get(id);
+        public Task<int> CountFieldSlots(int? fieldId) => SlotDAO.Instance.CountFieldSlots(fieldId);
         public Task<List<Slot>> GetList() => SlotDAO.Instance.GetList();
         public Task Add(Slot obj) => SlotDAO.Instance.Add(obj);
         public Task Update(Slot obj) => SlotDAO.Instance.Update(obj);
-        public Task Delete(int id) => SlotDAO.Instance.Delete(id);
+        public Task Delete(Slot obj) => SlotDAO.Instance.Delete(obj);
     }
 }

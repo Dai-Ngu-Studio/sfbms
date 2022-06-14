@@ -6,10 +6,10 @@ namespace Repositories
 {
     public class BookingRepository : IBookingRepository
     {
-        public Task<Booking?> Get(int id) => BookingDAO.Instance.Get(id);
-        public Task<List<Booking>> GetList() => BookingDAO.Instance.GetList();
+        public Task<Booking?> Get(int? id, string uid) => BookingDAO.Instance.Get(id, uid);
+        public Task<List<Booking>> GetList(string uid) => BookingDAO.Instance.GetList(uid);
         public Task Add(Booking obj) => BookingDAO.Instance.Add(obj);
         public Task Update(Booking obj) => BookingDAO.Instance.Update(obj);
-        public Task Delete(int id) => BookingDAO.Instance.Delete(id);
+        public Task Delete(Booking obj) => BookingDAO.Instance.Delete(obj);
     }
 }

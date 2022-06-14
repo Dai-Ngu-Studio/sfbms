@@ -27,7 +27,7 @@ namespace BusinessObject
         [Column("is_admin")]
         public int IsAdmin { get; set; }
 
-        public ICollection<Booking> Bookings { get; set; }
-        public ICollection<Feedback> Feedbacks { get; set; }
+        public ICollection<Booking>? Bookings { get; set; }
+        public ICollection<Feedback>? Feedbacks { get; set; }
     }
 }

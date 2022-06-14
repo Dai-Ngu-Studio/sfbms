@@ -27,12 +27,12 @@ namespace SFBMS_API.Controllers
 
         [EnableQuery]
         [HttpGet("{key}")]
-        public async Task<ActionResult<Category>> GetSingle([FromODataUri] int key)
+        public async Task<ActionResult<Category>> GetCategory(int key)
         {
             var obj = await categoryRepository.Get(key);
             if (obj == null)
             {
-                return NotFound();
+                return NotFound("Category not found");
             }
             return Ok(obj);
         }
@@ -66,7 +66,7 @@ namespace SFBMS_API.Controllers
             try
             {
                 await categoryRepository.Update(obj);
-                return Ok(obj);
+                return Updated(obj);
             }
             catch
             {
@@ -81,9 +81,15 @@ namespace SFBMS_API.Controllers
         [HttpDelete("{key}")]
         public async Task<ActionResult<Category>> Delete(int key)
         {
+            var obj = await categoryRepository.Get(key);
+            if (obj == null)
+            {
+                return NotFound("Category not found");
+            }
+
             try
             {
-                await categoryRepository.Delete(key);
+                await categoryRepository.Delete(obj);
                 return NoContent();
             }
             catch
