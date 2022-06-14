@@ -23,9 +23,9 @@ namespace SFBMS_API.Controllers
 
         [HttpGet]
         [EnableQuery(MaxExpansionDepth = 5)]
-        public async Task<ActionResult<List<BookingDetail>>> Get()
+        public async Task<ActionResult<List<BookingDetail>>> Get([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
-            return Ok(await bookingDetailRepository.GetList(GetCurrentUID()));
+            return Ok(await bookingDetailRepository.GetList(GetCurrentUID(), page, size));
         }
 
         [EnableQuery]

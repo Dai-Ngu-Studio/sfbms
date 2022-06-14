@@ -24,9 +24,9 @@ namespace SFBMS_API.Controllers
 
         [HttpGet]
         [EnableQuery(MaxExpansionDepth = 5)]
-        public async Task<ActionResult<List<Field>>> Get([FromQuery] string? search)
+        public async Task<ActionResult<List<Field>>> Get([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
-            return Ok(await fieldRepository.GetList(search));
+            return Ok(await fieldRepository.GetList(search, page, size));
         }
 
         [EnableQuery]

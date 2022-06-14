@@ -24,17 +24,18 @@ namespace DataAccess
             }
         }
 
-        public async Task<List<Field>> GetList(string? search)
+        public async Task<IEnumerable<Field>> GetList(string? search, int page, int size)
         {
             var db = new SfbmsDbContext();
-            List<Field>? list = null;
+            IEnumerable<Field>? list = null;
             list = await db.Fields        
                 .ToListAsync();
             if (!string.IsNullOrEmpty(search))
             {
                 list = list.Where(f => f.Name.ToLower().Contains(search.ToLower())).ToList();
             }
-            return list;
+            return list.Skip((page - 1) * size)
+                    .Take(size); 
         }
 
         public async Task<List<Slot>> GetFieldSlotsByDate(int? fieldId, DateTime? date)
