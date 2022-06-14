@@ -50,12 +50,14 @@ namespace SFBMS_API.Controllers
 
             try
             {
+                int slotNumbers = await slotRepository.CountFieldSlots(field.Id);
                 Slot slot = new Slot
                 {
                     FieldId = field.Id,
                     StartTime = obj.StartTime,
                     EndTime = obj.EndTime,  
-                    Status = obj.Status,
+                    Status = 0,
+                    SlotNumber = slotNumbers + 1
                 };
                 await slotRepository.Add(slot);
 
@@ -101,7 +103,8 @@ namespace SFBMS_API.Controllers
                     FieldId = obj.FieldId == null ? currentSlot.FieldId : obj.FieldId,
                     StartTime = obj.StartTime == DateTime.MinValue ? currentSlot.StartTime : obj.StartTime,
                     EndTime = obj.EndTime == DateTime.MinValue ? currentSlot.EndTime : obj.EndTime,
-                    Status = obj.Status == 0 ? currentSlot.Status : obj.Status,
+                    Status = obj.Status < 0 || obj.Status > 1 ? currentSlot.Status : obj.Status,
+                    SlotNumber = currentSlot.SlotNumber,
                 };
 
                 await slotRepository.Update(slot);

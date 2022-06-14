@@ -24,11 +24,31 @@ namespace DataAccess
             }
         }
 
-        public async Task<List<Field>> GetList()
+        public async Task<List<Field>> GetList(string? search)
         {
             var db = new SfbmsDbContext();
             List<Field>? list = null;
-            list = await db.Fields.ToListAsync();
+            list = await db.Fields        
+                .ToListAsync();
+            if (!string.IsNullOrEmpty(search))
+            {
+                list = list.Where(f => f.Name.ToLower().Contains(search.ToLower())).ToList();
+            }
+            return list;
+        }
+
+        public async Task<List<Slot>> GetFieldSlotsByDate(int? fieldId, DateTime? date)
+        {
+            var db = new SfbmsDbContext();
+            List<Slot>? list = null;
+            list = await db.Slots
+                .Where(x => x.FieldId == fieldId)
+                .ToListAsync();
+
+            if (date.HasValue)
+            {
+                list = list.Where(x => x.StartTime.Date.CompareTo(date.Value.Date) == 0).ToList();
+            }
             return list;
         }
 

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Repositories.Interfaces;
+using SFBMS_API.BusinessModels;
 using System.Security.Claims;
 
 namespace SFBMS_API.Controllers
@@ -17,12 +18,15 @@ namespace SFBMS_API.Controllers
         private readonly IBookingRepository bookingRepository;
         private readonly IBookingDetailRepository bookingDetailRepository;
         private readonly IFieldRepository fieldRepository;
+        private readonly ISlotRepository slotRepository;
 
-        public BookingsController(IBookingRepository _bookingRepository, IBookingDetailRepository _bookingDetailRepository, IFieldRepository _fieldRepository)
+        public BookingsController(IBookingRepository _bookingRepository, IBookingDetailRepository _bookingDetailRepository, 
+            IFieldRepository _fieldRepository, ISlotRepository _slotRepository)
         {
             bookingRepository = _bookingRepository;
             bookingDetailRepository = _bookingDetailRepository;
             fieldRepository = _fieldRepository;
+            slotRepository = _slotRepository;
         }
 
         [HttpGet]
@@ -45,11 +49,11 @@ namespace SFBMS_API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Booking>> Post(Booking obj)
+        public async Task<ActionResult<Booking>> Post(BookingModel bookingModel)
         {
             try
             {
-                if (obj.BookingDetails?.Count > 0)
+                if (bookingModel.Slots?.Count > 0)
                 {
                     Booking booking = new Booking
                     {
@@ -57,28 +61,46 @@ namespace SFBMS_API.Controllers
                     };
                     await bookingRepository.Add(booking);
 
-                    BookingDetail bookingDetail = null;
                     decimal totalPrice = 0;
-                    foreach (var item in obj.BookingDetails)
+                    foreach (var item in bookingModel.Slots)
                     {
                         var field = await fieldRepository.Get(item.FieldId);
-                        if (field == null)
+                        var slot = await slotRepository.Get(item.Id);
+                        
+                        if (slot != null && field != null && item.Status == 0)
                         {
-                            return NotFound("Field not found");
-                        }
+                            BookingDetail bookingDetail = new BookingDetail
+                            {
+                                BookingId = booking.Id,
+                                StartTime = slot.StartTime,
+                                EndTime = slot.EndTime,
+                                FieldId = field.Id,
+                                UserId = GetCurrentUID(),
+                                SlotNumber = slot.SlotNumber,
+                                Price = field.Price,
+                                Status = 0
+                            };
+                            await bookingDetailRepository.Add(bookingDetail);
+                            totalPrice += bookingDetail.Price;
 
-                        bookingDetail = new BookingDetail
-                        {
-                            BookingId = booking.Id,
-                            StartTime = item.StartTime,
-                            EndTime = item.EndTime,
-                            FieldId = item.FieldId,
-                            UserId = GetCurrentUID(),
-                            SlotNumber = item.SlotNumber,
-                            Price = field.Price,
-                        };
-                        await bookingDetailRepository.Add(bookingDetail);
-                        totalPrice += bookingDetail.Price;
+                            Slot _slot = new Slot
+                            {
+                                Id = slot.Id,
+                                SlotNumber = slot.SlotNumber,
+                                StartTime = slot.StartTime,
+                                EndTime = slot.EndTime,
+                                FieldId = field.Id,
+                                Status = 1
+                            };
+                            await slotRepository.Update(_slot);
+                        }                      
+                    }
+
+                    int countUserBookingDetail = await bookingDetailRepository.CountBookingDetails(booking.Id);
+                    if (countUserBookingDetail == 0)
+                    {
+                        await bookingRepository.Delete(booking);
+                        return BadRequest("There are currently no booking detail for this user");
                     }
 
                     Booking _booking = new Booking
@@ -95,10 +117,10 @@ namespace SFBMS_API.Controllers
             }
             catch
             {
-                if (await bookingRepository.Get(obj.Id, GetCurrentUID()) != null)
-                {
-                    return Conflict();
-                }
+                //if (await bookingRepository.Get(bookingModel.Id, GetCurrentUID()) != null)
+                //{
+                //    return Conflict();
+                //}
                 return BadRequest();
             }
         }

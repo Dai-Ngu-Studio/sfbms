@@ -24,15 +24,20 @@ namespace SFBMS_API.Controllers
 
         [HttpGet]
         [EnableQuery(MaxExpansionDepth = 5)]
-        public async Task<ActionResult<List<Field>>> Get()
+        public async Task<ActionResult<List<Field>>> Get([FromQuery] string? search)
         {
-            return Ok(await fieldRepository.GetList());
+            return Ok(await fieldRepository.GetList(search));
         }
 
         [EnableQuery]
         [HttpGet("{key}")]
-        public async Task<ActionResult<Field>> GetField(int key)
+        public async Task<ActionResult<Field>> GetField(int key, [FromQuery] DateTime? date)
         {
+            if (date.HasValue)
+            {
+                var slots = await fieldRepository.GetFieldSlotsByDate(key, date);
+                return Ok(slots);
+            }
             var obj = await fieldRepository.Get(key);
             if (obj == null)
             {
@@ -67,15 +72,18 @@ namespace SFBMS_API.Controllers
                 {
                     foreach (var item in obj.Slots)
                     {
+                        int slotNumbers = await slotRepository.CountFieldSlots(field.Id);
                         Slot slot = new Slot
                         {
                             FieldId = field.Id,
                             StartTime = item.StartTime,
                             EndTime = item.EndTime,
                             Status = item.Status,
+                            SlotNumber = slotNumbers + 1,
                         };
                         await slotRepository.Add(slot);                      
                     }
+
                     int fieldSlots = await slotRepository.CountFieldSlots(field.Id);
                     Field _field = new Field
                     {
