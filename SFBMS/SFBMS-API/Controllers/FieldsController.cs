@@ -1,4 +1,5 @@
 ﻿using BusinessObject;
+using Itenso.TimePeriod;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
@@ -35,7 +36,7 @@ namespace SFBMS_API.Controllers
         {
             if (date.HasValue)
             {
-                var slots = await fieldRepository.GetFieldSlotsByDate(key, date);
+                var slots = await slotRepository.GetFieldSlotsByDate(key, date);
                 return Ok(slots);
             }
             var obj = await fieldRepository.Get(key);
@@ -55,7 +56,6 @@ namespace SFBMS_API.Controllers
                 return NotFound("Category not found");
             }
 
-
             try
             {
                 Field field = new Field
@@ -64,38 +64,48 @@ namespace SFBMS_API.Controllers
                     Name = obj.Name,
                     Description = obj.Description,
                     Price = obj.Price < 0 ? 10000 : obj.Price,
-                    NumberOfSlots = 0
+                    NumberOfSlots = obj.NumberOfSlots > 0 || obj.NumberOfSlots < 14 ? obj.NumberOfSlots : 1,
+                    TotalRating = 0
                 };
 
                 await fieldRepository.Add(field);
-                if (obj.Slots?.Count > 0)
+
+                CalendarDateAdd calendarDateAdd = new CalendarDateAdd();
+                //calendarDateAdd.WorkingHours.Add(new HourRange(new Time(07, 00), new Time(23)));
+
+                DateTime start = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 0, 0, 0);
+                TimeSpan offset = new TimeSpan(1, 30, 0);
+                DateTime? end = calendarDateAdd.Add(start, offset);
+                TimeSpan interval = new TimeSpan(0, 15, 0);
+                if (obj.NumberOfSlots > 0 || obj.NumberOfSlots < 14)
                 {
-                    foreach (var item in obj.Slots)
-                    {
+                    for (int i = 1; i <= obj.NumberOfSlots; i++)
+                    {                      
                         int slotNumbers = await slotRepository.CountFieldSlots(field.Id);
                         Slot slot = new Slot
                         {
                             FieldId = field.Id,
-                            StartTime = item.StartTime,
-                            EndTime = item.EndTime,
-                            Status = item.Status,
+                            StartTime = start,
+                            EndTime = end.Value,
+                            Status = 0,
                             SlotNumber = slotNumbers + 1,
                         };
-                        await slotRepository.Add(slot);                      
+                        await slotRepository.Add(slot);
+                        start = (DateTime)calendarDateAdd.Add(end.Value, interval);
+                        end = calendarDateAdd.Add(start, offset);
                     }
-
-                    int fieldSlots = await slotRepository.CountFieldSlots(field.Id);
-                    Field _field = new Field
+                } else
+                {
+                    int slotNumbers = await slotRepository.CountFieldSlots(field.Id);
+                    Slot slot = new Slot
                     {
-                        Id = field.Id,
-                        CategoryId = field.CategoryId,
-                        Name = field.Name,
-                        Description = field.Description,
-                        Price = field.Price,
-                        NumberOfSlots = fieldSlots
+                        FieldId = field.Id,
+                        StartTime = start,
+                        EndTime = end.Value,
+                        Status = 0,
+                        SlotNumber = slotNumbers + 1,
                     };
-                    await fieldRepository.Update(_field);
-                    return Created(_field);
+                    await slotRepository.Add(slot);
                 }
 
                 return Created(field);

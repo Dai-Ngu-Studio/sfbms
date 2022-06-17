@@ -39,6 +39,21 @@ namespace DataAccess
             return obj;
         }
 
+        public async Task<List<Slot>> GetFieldSlotsByDate(int? fieldId, DateTime? date)
+        {
+            var db = new SfbmsDbContext();
+            List<Slot>? list = null;
+            list = await db.Slots
+                .Where(x => x.FieldId == fieldId)
+                .ToListAsync();
+
+            if (date.HasValue)
+            {
+                list = list.Where(x => x.StartTime.Date.CompareTo(date.Value.Date) == 0).ToList();
+            }
+            return list;
+        }
+
         public async Task<int> CountFieldSlots(int? fieldId)
         {
             var db = new SfbmsDbContext();
