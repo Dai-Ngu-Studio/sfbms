@@ -45,7 +45,7 @@ namespace SFBMS_API.Controllers
                     {
                         UserRecord? userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);                       
                         string? email = userRecord?.Email;
-                        string? name = String.IsNullOrWhiteSpace(userRecord?.DisplayName) ? email : userRecord?.DisplayName.Substring(0, 255);
+                        string? name = String.IsNullOrWhiteSpace(userRecord?.DisplayName) ? email : userRecord?.DisplayName;
                         User newUser = new User
                         {
                             Id = uid,
