@@ -11,7 +11,7 @@ namespace SFBMS_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class FeedbacksController : ODataController
     {
         private readonly IFeedbackRepository feedbackRepository;
@@ -25,9 +25,18 @@ namespace SFBMS_API.Controllers
 
         [HttpGet]
         [EnableQuery(MaxExpansionDepth = 5)]
-        public async Task<ActionResult<List<Feedback>>> Get([FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<ActionResult<List<Feedback>>> Get([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
-            return Ok(await feedbackRepository.GetList(page, size));
+            var feedbackList = await feedbackRepository.GetList(search, page, size);
+            int TotalFeedbacks = await feedbackRepository.GetTotalFeedbacks();
+            int TotalPages = (TotalFeedbacks - 1) / size + 1;
+
+            var model = new   
+            {
+                feedbacks = feedbackList,
+                numOfFeedbackPages = TotalPages
+            };
+            return Ok(model);
         }
 
         [EnableQuery]

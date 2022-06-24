@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace BusinessObject
 {
@@ -39,7 +40,9 @@ namespace BusinessObject
         public double TotalRating { get; set; }
 
         public ICollection<Slot>? Slots { get; set; }
+        [JsonIgnore]
         public ICollection<Feedback>? Feedbacks { get; set; }
+        [JsonIgnore]
         public ICollection<BookingDetail>? BookingDetails { get; set; }
     }
 }

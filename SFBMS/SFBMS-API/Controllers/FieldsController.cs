@@ -27,7 +27,15 @@ namespace SFBMS_API.Controllers
         [EnableQuery(MaxExpansionDepth = 5)]
         public async Task<ActionResult<List<Field>>> Get([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
-            return Ok(await fieldRepository.GetList(search, page, size));
+            var fieldList = await fieldRepository.GetList(search, page, size);
+            int TotalAccounts = await fieldRepository.GetTotalField(search!);
+            int TotalPages = (TotalAccounts - 1) / size + 1;
+            var model = new
+            {
+                fields = fieldList,
+                numOfFieldPages = TotalPages,
+            };
+            return Ok(model);
         }
 
         [EnableQuery]
@@ -139,6 +147,7 @@ namespace SFBMS_API.Controllers
                     Description = obj.Description == null ? currentField.Description : obj.Description, 
                     Price = obj.Price <= 0 ? currentField.Price : obj.Price,
                     NumberOfSlots = currentField.NumberOfSlots,
+                    TotalRating = currentField.TotalRating,
                 };
 
                 await fieldRepository.Update(field);

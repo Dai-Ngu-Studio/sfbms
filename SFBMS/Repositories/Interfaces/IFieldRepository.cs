@@ -8,6 +8,7 @@ namespace Repositories.Interfaces
         public Task<Field?> Get(int? id);
         public Task Add(Field obj);
         public Task Update(Field obj);
-        public Task Delete(Field obj);       
+        public Task Delete(Field obj);
+        public Task<int> GetTotalField(string search);
     }
 }

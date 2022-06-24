@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace BusinessObject
 {
@@ -27,7 +28,9 @@ namespace BusinessObject
         [Column("is_admin")]
         public int IsAdmin { get; set; }
 
+        [JsonIgnore]
         public ICollection<Booking>? Bookings { get; set; }
+        [JsonIgnore]
         public ICollection<Feedback>? Feedbacks { get; set; }
     }
 }

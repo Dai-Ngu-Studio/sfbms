@@ -12,6 +12,9 @@ namespace BusinessObject
         [Column("user_id", TypeName = "varchar(128)")]
         public string? UserId { get; set; }
 
+        [Column("feedback_time", TypeName = "datetime2(7)")]
+        public DateTime FeedbackTime { get; set; }
+
         [ForeignKey("UserId")]
         public User? User { get; set; }
 

@@ -24,7 +24,7 @@ namespace DataAccess
             }
         }
 
-        public async Task<IEnumerable<BookingDetail>> GetList(string uid, int page, int size)
+        public async Task<IEnumerable<BookingDetail>> GetUserList(string uid, int page, int size)
         {
             var db = new SfbmsDbContext();
             IEnumerable<BookingDetail>? list = null;
@@ -34,6 +34,32 @@ namespace DataAccess
 
             return list.Skip((page - 1) * size)
                     .Take(size);
+        }
+        public async Task<IEnumerable<BookingDetail>> GetAdminList(int page, int size)
+        {
+            var db = new SfbmsDbContext();
+            IEnumerable<BookingDetail>? list = null;
+            list = await db.BookingDetails
+                .Include(x => x.User)
+                .Include(x => x.Field)
+                .ToListAsync();
+
+            return list.Skip((page - 1) * size)
+                    .Take(size);
+        }
+
+        public async Task<int> GetTotalBookingDetail()
+        {
+            try
+            {
+                var db = new SfbmsDbContext();
+                int TotalBookingDetail = await db.BookingDetails.CountAsync();
+                return TotalBookingDetail;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public async Task<BookingDetail?> Get(int? id, string uid)

@@ -10,6 +10,7 @@ namespace Repositories
         public Task<IEnumerable<Field>> GetList(string? search, int page, int size) => FieldDAO.Instance.GetList(search, page, size);
         public Task Add(Field obj) => FieldDAO.Instance.Add(obj);
         public Task Update(Field obj) => FieldDAO.Instance.Update(obj);
-        public Task Delete(Field obj) => FieldDAO.Instance.Delete(obj);        
+        public Task Delete(Field obj) => FieldDAO.Instance.Delete(obj);
+        public Task<int> GetTotalField(string search) => FieldDAO.Instance.GetTotalField(search);
     }
 }

@@ -28,7 +28,9 @@ namespace DataAccess
         {
             var db = new SfbmsDbContext();
             IEnumerable<Field>? list = null;
-            list = await db.Fields        
+            list = await db.Fields   
+                .Include(c => c.Category)
+                .Include(x => x.Slots)
                 .ToListAsync();
             if (!string.IsNullOrEmpty(search))
             {
@@ -36,6 +38,30 @@ namespace DataAccess
             }
             return list.Skip((page - 1) * size)
                     .Take(size); 
+        }
+
+        public async Task<int> GetTotalField(string search)
+        {
+            try
+            {
+                var db = new SfbmsDbContext();
+                if (search != null)
+                {
+                    int TotalField= await db.Fields
+                        .Where(field => field.Name!.ToLower().Contains(search))
+                        .CountAsync();
+                    return TotalField;
+                }
+                else
+                {
+                    int TotalField = await db.Fields.CountAsync();
+                    return TotalField;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public async Task<Field?> Get(int? id)

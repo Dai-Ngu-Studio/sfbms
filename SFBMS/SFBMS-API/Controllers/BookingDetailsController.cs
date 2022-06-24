@@ -11,21 +11,47 @@ namespace SFBMS_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class BookingDetailsController : ODataController
     {
         private readonly IBookingDetailRepository bookingDetailRepository;
+        private readonly IUserRepository userRepository;
 
-        public BookingDetailsController(IBookingDetailRepository _bookingDetailRepository)
+        public BookingDetailsController(IBookingDetailRepository _bookingDetailRepository, IUserRepository _userRepository)
         {
             bookingDetailRepository = _bookingDetailRepository;
+            userRepository = _userRepository;
         }
 
         [HttpGet]
         [EnableQuery(MaxExpansionDepth = 5)]
         public async Task<ActionResult<List<BookingDetail>>> Get([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
-            return Ok(await bookingDetailRepository.GetList(GetCurrentUID(), page, size));
+            //User? user = await userRepository.Get(GetCurrentUID());
+            //if (user != null && user.IsAdmin == 1)
+            //{
+            //    var adminList = await bookingDetailRepository.GetAdminList(page, size);
+            //    int TotalBookingDetails = await bookingDetailRepository.GetTotalBookingDetail();
+            //    int TotalPages = (TotalBookingDetails - 1) / size + 1;
+
+            //    var model = new
+            //    {
+            //        bookingDetails = adminList,
+            //        numOfBookingDetailPages = TotalPages
+            //    };
+            //    return Ok(model);
+            //}
+            var adminList = await bookingDetailRepository.GetAdminList(page, size);
+            int TotalBookingDetails = await bookingDetailRepository.GetTotalBookingDetail();
+            int TotalPages = (TotalBookingDetails - 1) / size + 1;
+
+            var model = new
+            {
+                bookingDetails = adminList,
+                numOfBookingDetailPages = TotalPages
+            };
+            return Ok(model);
+            //return Ok(await bookingDetailRepository.GetUserList(GetCurrentUID(), page, size));
         }
 
         [EnableQuery]
