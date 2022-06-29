@@ -10,6 +10,5 @@ namespace Repositories.Interfaces
         public Task Add(Slot obj);
         public Task Update(Slot obj);
         public Task Delete(Slot obj);
-        public Task<List<Slot>> GetFieldSlotsByDate(int? fieldId, DateTime? date);
     }
 }

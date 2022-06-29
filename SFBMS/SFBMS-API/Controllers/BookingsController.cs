@@ -19,14 +19,16 @@ namespace SFBMS_API.Controllers
         private readonly IBookingDetailRepository bookingDetailRepository;
         private readonly IFieldRepository fieldRepository;
         private readonly ISlotRepository slotRepository;
+        private readonly IUserRepository userRepository;
 
         public BookingsController(IBookingRepository _bookingRepository, IBookingDetailRepository _bookingDetailRepository, 
-            IFieldRepository _fieldRepository, ISlotRepository _slotRepository)
+            IFieldRepository _fieldRepository, ISlotRepository _slotRepository, IUserRepository _userRepository)
         {
             bookingRepository = _bookingRepository;
             bookingDetailRepository = _bookingDetailRepository;
             fieldRepository = _fieldRepository;
             slotRepository = _slotRepository;
+            userRepository = _userRepository;
         }
 
         [HttpGet]
@@ -151,30 +153,35 @@ namespace SFBMS_API.Controllers
         [HttpDelete("{key}")]
         public async Task<ActionResult<Booking>> Delete(int key)
         {
-            var obj = await bookingRepository.Get(key, GetCurrentUID());
-            if (obj == null)
+            User? user = await userRepository.Get(GetCurrentUID());
+            if (user != null && user.IsAdmin == 1)
             {
-                return NotFound("Booking not found");
-            }
-            int userBookings = await bookingDetailRepository.CountBookingDetails(obj.Id);
-            if (userBookings > 0)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                await bookingRepository.Delete(obj);
-                return NoContent();
-            }
-            catch
-            {
-                if (await bookingRepository.Get(key, GetCurrentUID()) == null)
+                var obj = await bookingRepository.Get(key, GetCurrentUID());
+                if (obj == null)
                 {
-                    return NotFound();
+                    return NotFound("Booking not found");
                 }
-                return BadRequest();
+                int userBookings = await bookingDetailRepository.CountBookingDetails(obj.Id);
+                if (userBookings > 0)
+                {
+                    return BadRequest();
+                }
+
+                try
+                {
+                    await bookingRepository.Delete(obj);
+                    return NoContent();
+                }
+                catch
+                {
+                    if (await bookingRepository.Get(key, GetCurrentUID()) == null)
+                    {
+                        return NotFound();
+                    }
+                    return BadRequest();
+                }
             }
+            return Unauthorized();
         }
 
         private string GetCurrentUID()

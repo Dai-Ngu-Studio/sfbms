@@ -8,7 +8,8 @@ namespace Repositories.Interfaces
         public Task<IEnumerable<BookingDetail>> GetAdminList(int page, int size);
         public Task<int> GetTotalBookingDetail();
         public Task<int> CountBookingDetails(int? bookingId);
-        public Task<BookingDetail?> Get(int? id, string uid);
+        public Task<BookingDetail?> GetUserBookingDetail(int? id, string uid);
+        public Task<BookingDetail?> GetBookingDetailForAdmin(int? id);
         public Task Add(BookingDetail obj);
         public Task Update(BookingDetail obj);
         public Task Delete(BookingDetail obj);

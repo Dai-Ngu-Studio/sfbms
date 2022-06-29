@@ -11,7 +11,7 @@ namespace SFBMS_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class FeedbacksController : ODataController
     {
         private readonly IFeedbackRepository feedbackRepository;
@@ -31,7 +31,7 @@ namespace SFBMS_API.Controllers
             int TotalFeedbacks = await feedbackRepository.GetTotalFeedbacks();
             int TotalPages = (TotalFeedbacks - 1) / size + 1;
 
-            var model = new   
+            var model = new
             {
                 feedbacks = feedbackList,
                 numOfFeedbackPages = TotalPages
@@ -121,7 +121,8 @@ namespace SFBMS_API.Controllers
                         CategoryId = field.CategoryId,
                         Price = field.Price,
                         NumberOfSlots = field.NumberOfSlots,
-                        TotalRating = totalRating
+                        TotalRating = totalRating,
+                        ImageUrl = field.ImageUrl
                     };
                     await fieldRepository.Update(_field);
                 }

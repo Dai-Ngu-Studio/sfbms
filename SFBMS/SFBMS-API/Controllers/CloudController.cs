@@ -21,7 +21,7 @@ namespace SFBMS_API.Controllers
         [HttpPost("image")]
         [Consumes("text/plain")]
         //[Authorize]
-        public ActionResult UploadImage([FromBody] string body)
+        public async Task<ActionResult> UploadImage([FromBody] string body)
         {
             string? dataType = null;
             string? bodyData = null;
@@ -64,7 +64,7 @@ namespace SFBMS_API.Controllers
 
                 StorageClient storageClient = StorageClient.Create();
                 MemoryStream stream = new MemoryStream(bodyByte);
-                Google.Apis.Storage.v1.Data.Object gObject = storageClient.UploadObject(bucketName, $"{Guid.NewGuid()}{fileExtension}", dataType, stream);
+                Google.Apis.Storage.v1.Data.Object gObject = await storageClient.UploadObjectAsync(bucketName, $"{Guid.NewGuid()}{fileExtension}", dataType, stream);
 
                 Dictionary<string, string> jsonResponse = new Dictionary<string, string>();
                 jsonResponse.Add("imageUrl", $"{GoogleStorage}{gObject.Bucket}/{gObject.Name}");

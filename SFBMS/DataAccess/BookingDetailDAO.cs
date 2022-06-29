@@ -62,10 +62,16 @@ namespace DataAccess
             }
         }
 
-        public async Task<BookingDetail?> Get(int? id, string uid)
+        public async Task<BookingDetail?> GetUserBookingDetail(int? id, string uid)
         {
             var db = new SfbmsDbContext();
             BookingDetail? obj = await db.BookingDetails.FirstOrDefaultAsync(x => x.Id == id && x.UserId == uid);
+            return obj;
+        }
+        public async Task<BookingDetail?> GetBookingDetailForAdmin(int? id)
+        {
+            var db = new SfbmsDbContext();
+            BookingDetail? obj = await db.BookingDetails.FirstOrDefaultAsync(x => x.Id == id);
             return obj;
         }
 

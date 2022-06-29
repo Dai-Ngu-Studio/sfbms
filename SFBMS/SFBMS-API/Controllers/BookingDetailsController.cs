@@ -11,7 +11,7 @@ namespace SFBMS_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class BookingDetailsController : ODataController
     {
         private readonly IBookingDetailRepository bookingDetailRepository;
@@ -27,38 +27,28 @@ namespace SFBMS_API.Controllers
         [EnableQuery(MaxExpansionDepth = 5)]
         public async Task<ActionResult<List<BookingDetail>>> Get([FromQuery] int page = 1, [FromQuery] int size = 10)
         {
-            //User? user = await userRepository.Get(GetCurrentUID());
-            //if (user != null && user.IsAdmin == 1)
-            //{
-            //    var adminList = await bookingDetailRepository.GetAdminList(page, size);
-            //    int TotalBookingDetails = await bookingDetailRepository.GetTotalBookingDetail();
-            //    int TotalPages = (TotalBookingDetails - 1) / size + 1;
-
-            //    var model = new
-            //    {
-            //        bookingDetails = adminList,
-            //        numOfBookingDetailPages = TotalPages
-            //    };
-            //    return Ok(model);
-            //}
-            var adminList = await bookingDetailRepository.GetAdminList(page, size);
-            int TotalBookingDetails = await bookingDetailRepository.GetTotalBookingDetail();
-            int TotalPages = (TotalBookingDetails - 1) / size + 1;
-
-            var model = new
+            User? user = await userRepository.Get(GetCurrentUID());
+            if (user != null && user.IsAdmin == 1)
             {
-                bookingDetails = adminList,
-                numOfBookingDetailPages = TotalPages
-            };
-            return Ok(model);
-            //return Ok(await bookingDetailRepository.GetUserList(GetCurrentUID(), page, size));
+                var AdminList = await bookingDetailRepository.GetAdminList(page, size);
+                int TotalBookingDetails = await bookingDetailRepository.GetTotalBookingDetail();
+                int TotalPages = (TotalBookingDetails - 1) / size + 1;
+
+                var model = new
+                {
+                    bookingDetails = AdminList,
+                    numOfBookingDetailPages = TotalPages
+                };
+                return Ok(model);
+            }
+            return Ok(await bookingDetailRepository.GetUserList(GetCurrentUID(), page, size));
         }
 
         [EnableQuery]
         [HttpGet("{key}")]
         public async Task<ActionResult<BookingDetail>> GetBookingDetail(int key)
         {
-            var obj = await bookingDetailRepository.Get(key, GetCurrentUID());
+            var obj = await bookingDetailRepository.GetUserBookingDetail(key, GetCurrentUID());
             if (obj == null)
             {
                 return NotFound();
@@ -87,62 +77,72 @@ namespace SFBMS_API.Controllers
         [HttpPut("{key}")]
         public async Task<ActionResult<BookingDetail>> Put(int key, BookingDetail obj)
         {
-            var currentBookingDetail = await bookingDetailRepository.Get(key, GetCurrentUID());
-            if (currentBookingDetail == null)
+            User? user = await userRepository.Get(GetCurrentUID());
+            if (user != null && user.IsAdmin == 1)
             {
-                return NotFound();
-            }
-
-            try
-            {
-                BookingDetail bookingDetail = new BookingDetail
-                {
-                    Id = currentBookingDetail.Id,
-                    StartTime = currentBookingDetail.StartTime,
-                    EndTime = currentBookingDetail.EndTime,
-                    FieldId = currentBookingDetail.FieldId,
-                    UserId = currentBookingDetail.UserId,
-                    SlotNumber = currentBookingDetail.SlotNumber,
-                    BookingId = currentBookingDetail.BookingId,
-                    Price = currentBookingDetail.Price,
-                    Status = obj.Status < 0 || obj.Status > 3 ? currentBookingDetail.Status : obj.Status
-                };
-
-                await bookingDetailRepository.Update(bookingDetail);
-                return Updated(bookingDetail);
-            }
-            catch
-            {
-                if (await bookingDetailRepository.Get(obj.Id, GetCurrentUID()) == null)
+                var currentBookingDetail = await bookingDetailRepository.GetBookingDetailForAdmin(key);
+                if (currentBookingDetail == null)
                 {
                     return NotFound();
                 }
-                return BadRequest();
+
+                try
+                {
+                    BookingDetail bookingDetail = new BookingDetail
+                    {
+                        Id = currentBookingDetail.Id,
+                        StartTime = currentBookingDetail.StartTime,
+                        EndTime = currentBookingDetail.EndTime,
+                        FieldId = currentBookingDetail.FieldId,
+                        UserId = currentBookingDetail.UserId,
+                        SlotNumber = currentBookingDetail.SlotNumber,
+                        BookingId = currentBookingDetail.BookingId,
+                        Price = currentBookingDetail.Price,
+                        Status = obj.Status < 0 || obj.Status > 3 ? currentBookingDetail.Status : obj.Status
+                    };
+
+                    await bookingDetailRepository.Update(bookingDetail);
+                    return Updated(bookingDetail);
+                }
+                catch
+                {
+                    if (await bookingDetailRepository.GetBookingDetailForAdmin(obj.Id) == null)
+                    {
+                        return NotFound();
+                    }
+                    return BadRequest();
+                }               
             }
+            return Unauthorized();
         }
 
         [HttpDelete("{key}")]
         public async Task<ActionResult<BookingDetail>> Delete(int key)
         {
-            var obj = await bookingDetailRepository.Get(key, GetCurrentUID());
-            if (obj == null)
+            User? user = await userRepository.Get(GetCurrentUID());
+            if (user != null && user.IsAdmin == 1)
             {
-                return NotFound();
-            }
-
-            try
-            {
-                await bookingDetailRepository.Delete(obj);
-                return NoContent();
-            }
-            catch
-            {
-                if (await bookingDetailRepository.Get(key, GetCurrentUID()) == null)
+                var obj = await bookingDetailRepository.GetBookingDetailForAdmin(key);
+                if (obj == null)
                 {
                     return NotFound();
                 }
-                return BadRequest();
+
+                try
+                {
+                    await bookingDetailRepository.Delete(obj);
+                    return NoContent();
+                }
+                catch
+                {
+                    if (await bookingDetailRepository.GetBookingDetailForAdmin(key) == null)
+                    {
+                        return NotFound();
+                    }
+                    return BadRequest();
+                }               
             }
+            return Unauthorized();
         }
 
         private string GetCurrentUID()

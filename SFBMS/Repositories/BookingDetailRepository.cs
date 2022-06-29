@@ -6,7 +6,8 @@ namespace Repositories
 {
     public class BookingDetailRepository : IBookingDetailRepository
     {
-        public Task<BookingDetail?> Get(int? id, string uid) => BookingDetailDAO.Instance.Get(id, uid);
+        public Task<BookingDetail?> GetUserBookingDetail(int? id, string uid) => BookingDetailDAO.Instance.GetUserBookingDetail(id, uid);
+        public Task<BookingDetail?> GetBookingDetailForAdmin(int? id) => BookingDetailDAO.Instance.GetBookingDetailForAdmin(id);
         public Task<int> CountBookingDetails(int? bookingId) => BookingDetailDAO.Instance.CountBookingDetails(bookingId);
         public Task<int> GetTotalBookingDetail() => BookingDetailDAO.Instance.GetTotalBookingDetail();
         public Task<IEnumerable<BookingDetail>> GetUserList(string uid, int page, int size) => BookingDetailDAO.Instance.GetUserList(uid, page, size);
