@@ -1,7 +1,6 @@
 ﻿using BusinessObject;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Repositories.Interfaces;
@@ -21,7 +20,7 @@ namespace SFBMS_API.Controllers
         private readonly ISlotRepository slotRepository;
         private readonly IUserRepository userRepository;
 
-        public BookingsController(IBookingRepository _bookingRepository, IBookingDetailRepository _bookingDetailRepository, 
+        public BookingsController(IBookingRepository _bookingRepository, IBookingDetailRepository _bookingDetailRepository,
             IFieldRepository _fieldRepository, ISlotRepository _slotRepository, IUserRepository _userRepository)
         {
             bookingRepository = _bookingRepository;
@@ -68,7 +67,7 @@ namespace SFBMS_API.Controllers
                     {
                         var field = await fieldRepository.Get(item.FieldId);
                         var slot = await slotRepository.Get(item.Id);
-                        
+
                         if (slot != null && field != null && item.Status == 0)
                         {
                             BookingDetail bookingDetail = new BookingDetail
@@ -95,7 +94,7 @@ namespace SFBMS_API.Controllers
                                 Status = 1
                             };
                             await slotRepository.Update(_slot);
-                        }                      
+                        }
                     }
 
                     int countUserBookingDetail = await bookingDetailRepository.CountBookingDetails(booking.Id);

@@ -1,7 +1,6 @@
 ﻿using BusinessObject;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Repositories.Interfaces;
@@ -68,7 +67,7 @@ namespace SFBMS_API.Controllers
                         SlotNumber = slotNumbers + 1
                     };
                     await slotRepository.Add(slot);
-                    
+
                     if (slot != null)
                     {
                         Field _field = new Field
@@ -92,7 +91,7 @@ namespace SFBMS_API.Controllers
                         return Conflict();
                     }
                     return BadRequest();
-                }               
+                }
             }
             return Unauthorized();
         }
@@ -131,7 +130,7 @@ namespace SFBMS_API.Controllers
                         return NotFound();
                     }
                     return BadRequest();
-                }                
+                }
             }
             return Unauthorized();
         }
@@ -178,7 +177,7 @@ namespace SFBMS_API.Controllers
                         return NotFound();
                     }
                     return BadRequest();
-                }              
+                }
             }
             return Unauthorized();
         }

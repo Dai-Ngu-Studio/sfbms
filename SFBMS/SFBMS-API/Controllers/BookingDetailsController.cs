@@ -1,7 +1,6 @@
 ﻿using BusinessObject;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Repositories.Interfaces;
@@ -103,7 +102,7 @@ namespace SFBMS_API.Controllers
                         return NotFound();
                     }
                     return BadRequest();
-                }               
+                }
             }
             return Unauthorized();
         }
@@ -132,7 +131,7 @@ namespace SFBMS_API.Controllers
                         return NotFound();
                     }
                     return BadRequest();
-                }               
+                }
             }
             return Unauthorized();
         }

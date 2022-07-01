@@ -1,6 +1,4 @@
 ﻿using Google.Cloud.Storage.V1;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SFBMS_API.Controllers
