@@ -25,23 +25,15 @@ namespace SFBMS_API.Controllers
 
         [HttpGet]
         [EnableQuery(MaxExpansionDepth = 5)]
-        public async Task<ActionResult<List<BookingDetail>>> Get([FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<ActionResult<List<BookingDetail>>> Get()
         {
             User? user = await userRepository.Get(GetCurrentUID());
             if (user != null && user.IsAdmin == 1)
             {
-                var AdminList = await bookingDetailRepository.GetAdminList(page, size);
-                int TotalBookingDetails = await bookingDetailRepository.GetTotalBookingDetail();
-                int TotalPages = (TotalBookingDetails - 1) / size + 1;
-
-                var model = new
-                {
-                    bookingDetails = AdminList,
-                    numOfBookingDetailPages = TotalPages
-                };
-                return Ok(model);
+                var list = await bookingDetailRepository.GetAdminList();
+                return Ok(list);
             }
-            return Ok(await bookingDetailRepository.GetUserList(GetCurrentUID(), page, size));
+            return Ok(await bookingDetailRepository.GetUserList(GetCurrentUID()));
         }
 
         [EnableQuery]

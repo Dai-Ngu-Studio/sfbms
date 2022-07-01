@@ -24,21 +24,14 @@ namespace DataAccess
             }
         }
 
-        public async Task<IEnumerable<Feedback>> GetList(string? search, int page, int size)
+        public async Task<IEnumerable<Feedback>> GetList()
         {
             var db = new SfbmsDbContext();
-            List<Feedback>? list = null;
-            list = await db.Feedbacks
+            List<Feedback>? list = await db.Feedbacks
                  .Include(x => x.User)
                  .Include(c => c.Field)
                  .ToListAsync();
-
-            if (!string.IsNullOrEmpty(search))
-            {
-                list = list.Where(feedback => feedback.Title.ToLower().Contains(search.ToLower())).ToList();
-            }
-            return list.Skip((page - 1) * size)
-                .Take(size);
+            return list;
         }
 
         public async Task<Feedback?> Get(int? id)
@@ -75,21 +68,17 @@ namespace DataAccess
         public async Task<List<Feedback>> GetFieldFeedbacks(int? fieldId)
         {
             var db = new SfbmsDbContext();
-            List<Feedback>? list = null;
-            list = await db.Feedbacks
+            List<Feedback>? list = await db.Feedbacks
                 .Where(x => x.FieldId == fieldId)
                 .ToListAsync();
             return list;
         }
 
-        public async Task<List<Feedback>> GetUserFeedbacks(string uid, int page, int size)
+        public async Task<List<Feedback>> GetUserFeedbacks(string uid)
         {
             var db = new SfbmsDbContext();
-            List<Feedback>? list = null;
-            list = await db.Feedbacks
+            List<Feedback>? list = await db.Feedbacks
                 .Where(x => x.UserId == uid)
-                .Skip((page - 1) * size)
-                .Take(size)
                 .ToListAsync();
             return list;
         }

@@ -31,17 +31,10 @@ namespace SFBMS_API.Controllers
 
         [HttpGet]
         [EnableQuery(MaxExpansionDepth = 5)]
-        public async Task<ActionResult<List<Field>>> Get([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<ActionResult<List<Field>>> Get()
         {
-            var fieldList = await fieldRepository.GetList(search, page, size);
-            int TotalAccounts = await fieldRepository.GetTotalField(search!);
-            int TotalPages = (TotalAccounts - 1) / size + 1;
-            var model = new
-            {
-                fields = fieldList,
-                numOfFieldPages = TotalPages,
-            };
-            return Ok(model);
+            var fieldList = await fieldRepository.GetList();
+            return Ok(fieldList);
         }
 
         [EnableQuery]

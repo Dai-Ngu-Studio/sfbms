@@ -70,6 +70,7 @@ builder.Services.AddSwaggerGen(options =>
 static IEdmModel GetEdmModel()
 {
     var modelBuilder = new ODataConventionModelBuilder();
+    modelBuilder.EnableLowerCamelCase();
     modelBuilder.EntitySet<User>("Users").EntityType.HasKey(x => x.Id);
     modelBuilder.EntitySet<Field>("Fields").EntityType.HasKey(x => x.Id);
     modelBuilder.EntitySet<Slot>("Slots").EntityType.HasKey(x => x.Id);

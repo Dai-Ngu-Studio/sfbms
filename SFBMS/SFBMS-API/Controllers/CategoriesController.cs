@@ -28,11 +28,7 @@ namespace SFBMS_API.Controllers
         public async Task<ActionResult<List<Category>>> Get()
         {
             var categoryList = await categoryRepository.GetList();
-            var model = new
-            {
-                categories = categoryList
-            };
-            return Ok(model);
+            return Ok(categoryList);
         }
 
         [EnableQuery]

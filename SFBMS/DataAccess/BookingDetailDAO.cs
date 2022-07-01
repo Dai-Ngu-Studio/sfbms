@@ -24,28 +24,24 @@ namespace DataAccess
             }
         }
 
-        public async Task<IEnumerable<BookingDetail>> GetUserList(string uid, int page, int size)
+        public async Task<IEnumerable<BookingDetail>> GetUserList(string uid)
         {
             var db = new SfbmsDbContext();
-            IEnumerable<BookingDetail>? list = null;
-            list = await db.BookingDetails
+            IEnumerable<BookingDetail>? list = await db.BookingDetails
                 .Where(x => x.UserId == uid)
                 .ToListAsync();
 
-            return list.Skip((page - 1) * size)
-                    .Take(size);
+            return list;
         }
-        public async Task<IEnumerable<BookingDetail>> GetAdminList(int page, int size)
+        public async Task<IEnumerable<BookingDetail>> GetAdminList()
         {
             var db = new SfbmsDbContext();
-            IEnumerable<BookingDetail>? list = null;
-            list = await db.BookingDetails
+            IEnumerable<BookingDetail>? list = await db.BookingDetails
                 .Include(x => x.User)
                 .Include(x => x.Field)
                 .ToListAsync();
 
-            return list.Skip((page - 1) * size)
-                    .Take(size);
+            return list;
         }
 
         public async Task<int> GetTotalBookingDetail()

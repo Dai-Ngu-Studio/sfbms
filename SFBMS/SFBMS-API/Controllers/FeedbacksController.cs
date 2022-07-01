@@ -25,18 +25,10 @@ namespace SFBMS_API.Controllers
 
         [HttpGet]
         [EnableQuery(MaxExpansionDepth = 5)]
-        public async Task<ActionResult<List<Feedback>>> Get([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<ActionResult<List<Feedback>>> Get()
         {
-            var feedbackList = await feedbackRepository.GetList(search, page, size);
-            int TotalFeedbacks = await feedbackRepository.GetTotalFeedbacks();
-            int TotalPages = (TotalFeedbacks - 1) / size + 1;
-
-            var model = new
-            {
-                feedbacks = feedbackList,
-                numOfFeedbackPages = TotalPages
-            };
-            return Ok(model);
+            var feedbackList = await feedbackRepository.GetList();
+            return Ok(feedbackList);
         }
 
         [EnableQuery]
@@ -53,9 +45,9 @@ namespace SFBMS_API.Controllers
 
         [HttpGet("user-feedbacks")]
         [EnableQuery(MaxExpansionDepth = 5)]
-        public async Task<ActionResult<List<Feedback>>> GetUserFeedbacks([FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<ActionResult<List<Feedback>>> GetUserFeedbacks()
         {
-            return Ok(await feedbackRepository.GetUserFeedbacks(GetCurrentUID(), page, size));
+            return Ok(await feedbackRepository.GetUserFeedbacks(GetCurrentUID()));
         }
 
         [EnableQuery]
