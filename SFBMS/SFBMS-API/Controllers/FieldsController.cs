@@ -19,14 +19,16 @@ namespace SFBMS_API.Controllers
         private readonly ICategoryRepository categoryRepository;
         private readonly ISlotRepository slotRepository;
         private readonly IUserRepository userRepository;
+        private readonly IBookingDetailRepository bookingDetailRepository;
 
-        public FieldsController(IFieldRepository _fieldRepository, ICategoryRepository _categoryRepository, ISlotRepository _slotRepository, 
-            IUserRepository _userRepository)
+        public FieldsController(IFieldRepository _fieldRepository, ICategoryRepository _categoryRepository, ISlotRepository _slotRepository,
+            IUserRepository _userRepository, IBookingDetailRepository bookingDetailRepository)
         {
             fieldRepository = _fieldRepository;
             categoryRepository = _categoryRepository;
             slotRepository = _slotRepository;
             userRepository = _userRepository;
+            this.bookingDetailRepository = bookingDetailRepository;
         }
 
         [HttpGet]
@@ -47,6 +49,35 @@ namespace SFBMS_API.Controllers
                 return NotFound("Field not found");
             }
             return Ok(obj);
+        }
+
+        [EnableQuery]
+        [HttpPost("{key}/slot-status")]
+        public async Task<ActionResult<Field>> SlotStatus([FromODataUri] int key, ODataActionParameters parameters)
+        {
+            try
+            {
+                var obj = await fieldRepository.Get(key);
+                if (obj == null)
+                {
+                    return NotFound("Field not found");
+                }
+
+                var bookingDateOffset = (DateTimeOffset)parameters["BookingDate"];
+                var bookingDate = bookingDateOffset.DateTime;
+                List<BookingDetail> bookingDetails = (await bookingDetailRepository.GetBookingDetailsForDate(key, bookingDate)).ToList();
+
+                foreach (var slot in obj.Slots!)
+                {
+                    slot.BookingStatus = bookingDetails.Any(x => x.StartTime.TimeOfDay == slot.StartTime.TimeOfDay) ? 1 : 0;
+                }
+                return Ok(obj);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return StatusCode(500);
+            }
         }
 
         [HttpPost]
@@ -123,7 +154,7 @@ namespace SFBMS_API.Controllers
                         return Conflict();
                     }
                     return BadRequest();
-                }               
+                }
             }
             return Unauthorized();
         }
@@ -164,7 +195,7 @@ namespace SFBMS_API.Controllers
                         return NotFound();
                     }
                     return BadRequest();
-                }             
+                }
             }
             return Unauthorized();
         }
@@ -198,7 +229,7 @@ namespace SFBMS_API.Controllers
                         return NotFound();
                     }
                     return BadRequest();
-                }               
+                }
             }
             return Unauthorized();
         }

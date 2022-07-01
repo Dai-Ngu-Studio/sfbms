@@ -13,5 +13,6 @@ namespace Repositories.Interfaces
         public Task Add(BookingDetail obj);
         public Task Update(BookingDetail obj);
         public Task Delete(BookingDetail obj);
+        public Task<IEnumerable<BookingDetail>> GetBookingDetailsForDate(int fieldId, DateTime bookingDate);
     }
 }

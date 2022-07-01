@@ -26,5 +26,7 @@ namespace BusinessObject
 
         [Column("slot_number")]
         public int SlotNumber { get; set; }
+
+        public int? BookingStatus { get; set; } = 0;
     }
 }

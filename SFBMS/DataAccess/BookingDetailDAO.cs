@@ -100,5 +100,17 @@ namespace DataAccess
             db.BookingDetails.Remove(obj);
             await db.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<BookingDetail>> GetBookingDetailsForDate(int fieldId, DateTime bookingDate)
+        {
+            var db = new SfbmsDbContext();
+            IEnumerable<BookingDetail>? list = await db.BookingDetails
+                .Include(x => x.User)
+                .Include(x => x.Field)
+                .Where(x => x.StartTime.Date == bookingDate.Date && x.Field!.Id == fieldId)
+                .ToListAsync();
+
+            return list;
+        }
     }
 }

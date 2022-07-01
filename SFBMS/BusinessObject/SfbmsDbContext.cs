@@ -34,6 +34,7 @@ namespace BusinessObject
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Slot>().Ignore(p => p.BookingStatus);
         }
     }
 }

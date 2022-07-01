@@ -10,6 +10,7 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OpenApi.Models;
 using Repositories;
 using Repositories.Interfaces;
+using SFBMS_API.BusinessModels;
 using SFBMS_API.Utilities;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -78,6 +79,9 @@ static IEdmModel GetEdmModel()
     modelBuilder.EntitySet<Booking>("Bookings").EntityType.HasKey(x => x.Id);
     modelBuilder.EntitySet<BookingDetail>("BookingDetails").EntityType.HasKey(x => x.Id);
     modelBuilder.EntitySet<Feedback>("Feedbacks").EntityType.HasKey(x => x.Id);
+    var field = modelBuilder.EntityType<Field>();
+    field.Action("SlotStatus").ReturnsFromEntitySet<Field>("Fields")
+        .Parameter<DateTime>("BookingDate");
     return modelBuilder.GetEdmModel();
 }
 
