@@ -37,7 +37,10 @@ namespace DataAccess
         public async Task<Feedback?> Get(int? id)
         {
             var db = new SfbmsDbContext();
-            Feedback? obj = await db.Feedbacks.FirstOrDefaultAsync(x => x.Id == id);
+            Feedback? obj = await db.Feedbacks
+                .Include(x => x.Field)
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.Id == id);
             return obj;
         }
 

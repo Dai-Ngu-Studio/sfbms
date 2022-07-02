@@ -39,6 +39,16 @@ namespace SFBMS_API.Controllers
         [HttpGet("{key}")]
         public async Task<ActionResult<BookingDetail>> GetBookingDetail(int key)
         {
+            User? user = await userRepository.Get(GetCurrentUID());
+            if (user != null && user.IsAdmin == 1)
+            {
+                var admin = await bookingDetailRepository.GetBookingDetailForAdmin(key);
+                if (admin == null)
+                {
+                    return NotFound();
+                }
+                return Ok(admin);
+            }
             var obj = await bookingDetailRepository.GetUserBookingDetail(key, GetCurrentUID());
             if (obj == null)
             {

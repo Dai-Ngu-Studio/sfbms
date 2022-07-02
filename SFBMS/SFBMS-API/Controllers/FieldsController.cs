@@ -22,13 +22,13 @@ namespace SFBMS_API.Controllers
         private readonly IBookingDetailRepository bookingDetailRepository;
 
         public FieldsController(IFieldRepository _fieldRepository, ICategoryRepository _categoryRepository, ISlotRepository _slotRepository,
-            IUserRepository _userRepository, IBookingDetailRepository bookingDetailRepository)
+            IUserRepository _userRepository, IBookingDetailRepository _bookingDetailRepository)
         {
             fieldRepository = _fieldRepository;
             categoryRepository = _categoryRepository;
             slotRepository = _slotRepository;
             userRepository = _userRepository;
-            this.bookingDetailRepository = bookingDetailRepository;
+            bookingDetailRepository = _bookingDetailRepository;
         }
 
         [HttpGet]

@@ -15,44 +15,42 @@ namespace SFBMS_API.Controllers
     {
         private readonly IFeedbackRepository feedbackRepository;
         private readonly IFieldRepository fieldRepository;
+        private readonly IUserRepository userRepository;
 
-        public FeedbacksController(IFeedbackRepository _feedbackRepository, IFieldRepository _fieldRepository)
+        public FeedbacksController(IFeedbackRepository _feedbackRepository, IFieldRepository _fieldRepository, IUserRepository _userRepository)
         {
             feedbackRepository = _feedbackRepository;
             fieldRepository = _fieldRepository;
+            userRepository = _userRepository;
         }
 
         [HttpGet]
         [EnableQuery(MaxExpansionDepth = 5)]
         public async Task<ActionResult<List<Feedback>>> Get()
         {
-            var feedbackList = await feedbackRepository.GetList();
-            return Ok(feedbackList);
+            User? user = await userRepository.Get(GetCurrentUID());
+            if (user != null && user.IsAdmin == 1)
+            {
+                var feedbackList = await feedbackRepository.GetList();
+                return Ok(feedbackList);
+            }
+            return Ok(await feedbackRepository.GetUserFeedbacks(GetCurrentUID()));
         }
 
         [EnableQuery]
         [HttpGet("{key}")]
         public async Task<ActionResult<Feedback>> GetFeedback(int key)
         {
-            var obj = await feedbackRepository.Get(key);
-            if (obj == null)
+            User? user = await userRepository.Get(GetCurrentUID());
+            if (user != null && user.IsAdmin == 1)
             {
-                return NotFound("Feedback not found"); ;
+                var admin = await feedbackRepository.Get(key);
+                if (admin == null)
+                {
+                    return NotFound("Feedback not found"); ;
+                }
+                return Ok(admin);
             }
-            return Ok(obj);
-        }
-
-        [HttpGet("user-feedbacks")]
-        [EnableQuery(MaxExpansionDepth = 5)]
-        public async Task<ActionResult<List<Feedback>>> GetUserFeedbacks()
-        {
-            return Ok(await feedbackRepository.GetUserFeedbacks(GetCurrentUID()));
-        }
-
-        [EnableQuery]
-        [HttpGet("user-feedback/{key}")]
-        public async Task<ActionResult<Feedback>> GetSingleUserFeedback(int key)
-        {
             var obj = await feedbackRepository.GetSingleUserFeedback(key, GetCurrentUID());
             if (obj == null)
             {
@@ -60,6 +58,25 @@ namespace SFBMS_API.Controllers
             }
             return Ok(obj);
         }
+
+        //[HttpGet("user-feedbacks")]
+        //[EnableQuery(MaxExpansionDepth = 5)]
+        //public async Task<ActionResult<List<Feedback>>> GetUserFeedbacks()
+        //{
+        //    return Ok(await feedbackRepository.GetUserFeedbacks(GetCurrentUID()));
+        //}
+
+        //[EnableQuery]
+        //[HttpGet("user-feedback/{key}")]
+        //public async Task<ActionResult<Feedback>> GetSingleUserFeedback(int key)
+        //{
+        //    var obj = await feedbackRepository.GetSingleUserFeedback(key, GetCurrentUID());
+        //    if (obj == null)
+        //    {
+        //        return NotFound("Feedback not found"); ;
+        //    }
+        //    return Ok(obj);
+        //}
 
         [HttpPost]
         public async Task<ActionResult<Feedback>> Post(Feedback obj)
