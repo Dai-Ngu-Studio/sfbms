@@ -113,5 +113,34 @@ namespace DataAccess
 
             return list;
         }
+
+        public async Task<IEnumerable<BookingDetail>> GetPendingBookingDetailsForDate(DateTime date)
+        {
+            var db = new SfbmsDbContext();
+            IEnumerable<BookingDetail>? list = await db.BookingDetails
+                .Include(x => x.User)
+                .Include(x => x.Field)
+                .Where(x => x.StartTime.Date == date.Date 
+                && (x.Status == (int)BookingDetailStatus.NotYet 
+                || x.Status == (int)BookingDetailStatus.Open))
+                .ToListAsync();
+
+            return list;
+        }
+
+        public async Task UpdateRange(BookingDetail[] obj)
+        {
+            var db = new SfbmsDbContext();
+            db.BookingDetails.UpdateRange(obj);
+            await db.SaveChangesAsync();
+        }
+    }
+
+    enum BookingDetailStatus : int
+    {
+        NotYet = 0,
+        Open = 1,
+        Attended = 2,
+        Absent = 3
     }
 }

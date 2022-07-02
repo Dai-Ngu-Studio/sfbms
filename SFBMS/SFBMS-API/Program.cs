@@ -10,6 +10,7 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OpenApi.Models;
 using Repositories;
 using Repositories.Interfaces;
+using SFBMS_API.Services;
 using SFBMS_API.Utilities;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -28,6 +29,7 @@ builder.Services.AddControllers(o =>
     x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 
+builder.Services.AddHostedService<BookingStatusService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IFieldRepository, FieldRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();

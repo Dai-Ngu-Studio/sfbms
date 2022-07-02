@@ -14,5 +14,7 @@ namespace Repositories.Interfaces
         public Task Update(BookingDetail obj);
         public Task Delete(BookingDetail obj);
         public Task<IEnumerable<BookingDetail>> GetBookingDetailsForDate(int fieldId, DateTime bookingDate);
+        public Task<IEnumerable<BookingDetail>> GetPendingBookingDetailsForDate(DateTime date);
+        public Task UpdateRange(BookingDetail[] obj);
     }
 }

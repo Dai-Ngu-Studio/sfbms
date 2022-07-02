@@ -16,5 +16,7 @@ namespace Repositories
         public Task Update(BookingDetail obj) => BookingDetailDAO.Instance.Update(obj);
         public Task Delete(BookingDetail obj) => BookingDetailDAO.Instance.Delete(obj);
         public Task<IEnumerable<BookingDetail>> GetBookingDetailsForDate(int fieldId, DateTime bookingDate) => BookingDetailDAO.Instance.GetBookingDetailsForDate(fieldId, bookingDate);
+        public Task<IEnumerable<BookingDetail>> GetPendingBookingDetailsForDate(DateTime date) => BookingDetailDAO.Instance.GetPendingBookingDetailsForDate(date);
+        public Task UpdateRange(BookingDetail[] obj) => BookingDetailDAO.Instance.UpdateRange(obj);
     }
 }
