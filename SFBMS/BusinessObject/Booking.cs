@@ -23,6 +23,9 @@ namespace BusinessObject
         [ForeignKey("UserId")]
         public User? User { get; set; }
 
+        [Column("booking_date", TypeName = "datetime2(7)")]
+        public DateTime? BookingDate { get; set; }
+
         public ICollection<BookingDetail>? BookingDetails { get; set; }
     }
 }

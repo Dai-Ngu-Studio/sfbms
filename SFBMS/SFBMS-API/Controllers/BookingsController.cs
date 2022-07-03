@@ -108,7 +108,8 @@ namespace SFBMS_API.Controllers
                     {
                         Id = booking.Id,
                         UserId = booking.UserId,
-                        TotalPrice = totalPrice
+                        TotalPrice = totalPrice,
+                        BookingDate = DateTime.Now,
                     };
                     await bookingRepository.Update(_booking);
                     return Created(_booking);
@@ -185,7 +186,7 @@ namespace SFBMS_API.Controllers
 
         private string GetCurrentUID()
         {
-            return User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
         }
     }
 }
