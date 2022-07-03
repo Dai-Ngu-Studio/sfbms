@@ -81,6 +81,8 @@ namespace DataAccess
         {
             var db = new SfbmsDbContext();
             List<Feedback>? list = await db.Feedbacks
+                .Include(x => x.User)
+                .Include(x => x.Field)
                 .Where(x => x.UserId == uid)
                 .ToListAsync();
             return list;
@@ -90,6 +92,8 @@ namespace DataAccess
         {
             var db = new SfbmsDbContext();
             Feedback? obj = await db.Feedbacks
+                .Include(x => x.User)
+                .Include(x => x.Field)
                 .FirstOrDefaultAsync(x => x.UserId == uid && x.Id == id);
             return obj;
         }
