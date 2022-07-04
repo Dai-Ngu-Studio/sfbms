@@ -29,6 +29,7 @@ namespace DataAccess
             var db = new SfbmsDbContext();
             List<Booking>? list = null;
             list = await db.Bookings
+                .Include(x => x.BookingDetails).Include(x => x.User)
                 .Where(x => x.UserId == uid)
                 .ToListAsync();
             return list;
