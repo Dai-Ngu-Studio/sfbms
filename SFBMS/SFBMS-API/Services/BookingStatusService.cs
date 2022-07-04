@@ -79,12 +79,4 @@ namespace SFBMS_API.Services
             _logger.LogInformation("Disposed timer for booking status check.");
         }
     }
-
-    enum BookingDetailStatus : int
-    {
-        NotYet = 0,
-        Open = 1,
-        Attended = 2,
-        Absent = 3
-    }
 }

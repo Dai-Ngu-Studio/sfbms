@@ -26,6 +26,9 @@ namespace BusinessObject
         [Column("booking_date", TypeName = "datetime2(7)")]
         public DateTime? BookingDate { get; set; }
 
+        [Column("number_of_fields")]
+        public int? NumberOfFields { get; set; }
+
         public ICollection<BookingDetail>? BookingDetails { get; set; }
     }
 }

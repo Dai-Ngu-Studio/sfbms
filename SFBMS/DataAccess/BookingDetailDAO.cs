@@ -135,12 +135,4 @@ namespace DataAccess
             await db.SaveChangesAsync();
         }
     }
-
-    enum BookingDetailStatus : int
-    {
-        NotYet = 0,
-        Open = 1,
-        Attended = 2,
-        Absent = 3
-    }
 }

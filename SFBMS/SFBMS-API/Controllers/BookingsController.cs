@@ -49,70 +49,58 @@ namespace SFBMS_API.Controllers
             return Ok(obj);
         }
 
+        /// <summary>
+        /// Slot must include: id, startTime, endTime, fieldId, slotNumber, status
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<Booking>> Post(BookingModel bookingModel)
+        public async Task<ActionResult<Booking>> Post([FromBody] BookingModel bookingModel)
         {
             try
             {
                 if (bookingModel.Slots?.Count > 0)
                 {
-                    Booking booking = new Booking
-                    {
-                        UserId = GetCurrentUID(),
-                    };
-                    await bookingRepository.Add(booking);
-
+                    var numberOfFields = new HashSet<int>();
+                    var bookingDetails = new List<BookingDetail>();
                     decimal totalPrice = 0;
                     foreach (var item in bookingModel.Slots)
                     {
-                        var field = await fieldRepository.Get(item.FieldId);
-                        var slot = await slotRepository.Get(item.Id);
+                        if (item.FieldId == null)
+                        {
+                            continue;
+                        }
 
-                        if (slot != null && field != null && item.Status == 0)
+                        var field = await fieldRepository.Get(item.FieldId);
+
+                        if (field != null)
                         {
                             BookingDetail bookingDetail = new BookingDetail
                             {
-                                BookingId = booking.Id,
-                                StartTime = slot.StartTime,
-                                EndTime = slot.EndTime,
+                                StartTime = item.StartTime,
+                                EndTime = item.EndTime,
                                 FieldId = field.Id,
                                 UserId = GetCurrentUID(),
-                                SlotNumber = slot.SlotNumber,
+                                SlotNumber = item.SlotNumber,
                                 Price = field.Price,
-                                Status = 0
+                                Status = (int)BookingDetailStatus.NotYet,
                             };
-                            await bookingDetailRepository.Add(bookingDetail);
+                            bookingDetails.Add(bookingDetail);
                             totalPrice += bookingDetail.Price;
-
-                            Slot _slot = new Slot
-                            {
-                                Id = slot.Id,
-                                SlotNumber = slot.SlotNumber,
-                                StartTime = slot.StartTime,
-                                EndTime = slot.EndTime,
-                                FieldId = field.Id,
-                                Status = 1
-                            };
-                            await slotRepository.Update(_slot);
+                            numberOfFields.Add(field.Id);
                         }
                     }
 
-                    int countUserBookingDetail = await bookingDetailRepository.CountBookingDetails(booking.Id);
-                    if (countUserBookingDetail == 0)
+                    Booking booking = new Booking
                     {
-                        await bookingRepository.Delete(booking);
-                        return BadRequest("There are currently no booking detail for this user");
-                    }
-
-                    Booking _booking = new Booking
-                    {
-                        Id = booking.Id,
-                        UserId = booking.UserId,
+                        UserId = GetCurrentUID(),
                         TotalPrice = totalPrice,
                         BookingDate = DateTime.Now,
+                        NumberOfFields = numberOfFields.Count,
+                        BookingDetails = bookingDetails
                     };
-                    await bookingRepository.Update(_booking);
-                    return Created(_booking);
+
+                    await bookingRepository.Add(booking);
+                    return Created(booking);
                 }
 
                 return BadRequest();

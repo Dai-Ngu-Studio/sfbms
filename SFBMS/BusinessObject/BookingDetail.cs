@@ -42,4 +42,12 @@ namespace BusinessObject
         [Column("status")]
         public int Status { get; set; }
     }
+
+    public enum BookingDetailStatus : int
+    {
+        NotYet = 0,
+        Open = 1,
+        Attended = 2,
+        Absent = 3
+    }
 }
