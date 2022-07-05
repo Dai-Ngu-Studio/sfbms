@@ -53,7 +53,7 @@ namespace SFBMS_API.Controllers
 
         [EnableQuery]
         [HttpPost("{key}/slot-status")]
-        public async Task<ActionResult<Field>> SlotStatus([FromODataUri] int key, ODataActionParameters parameters)
+        public async Task<ActionResult<Field>> SlotStatus([FromODataUri] int key, DateTime bookingDate)
         {
             try
             {
@@ -63,8 +63,8 @@ namespace SFBMS_API.Controllers
                     return NotFound("Field not found");
                 }
 
-                var bookingDateOffset = (DateTimeOffset)parameters["BookingDate"];
-                var bookingDate = bookingDateOffset.DateTime;
+                //var bookingDateOffset = (DateTimeOffset)parameters["BookingDate"];
+                //var _bookingDate = bookingDate.DateTime;
                 List<BookingDetail> bookingDetails = (await bookingDetailRepository.GetBookingDetailsForDate(key, bookingDate)).ToList();
 
                 foreach (var slot in obj.Slots!)
