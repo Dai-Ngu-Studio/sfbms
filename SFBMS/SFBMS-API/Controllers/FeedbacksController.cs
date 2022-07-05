@@ -122,7 +122,7 @@ namespace SFBMS_API.Controllers
                         TotalRating = GetTotalRating(feedbacks),
                         ImageUrl = field.ImageUrl
                     };
-                    await fieldRepository.Update(field);
+                    await fieldRepository.Update(_field);
                 }
 
                 return Created(feedback);
@@ -184,7 +184,7 @@ namespace SFBMS_API.Controllers
                         TotalRating = GetTotalRating(feedbacks),
                         ImageUrl = field.ImageUrl
                     };
-                    await fieldRepository.Update(field);
+                    await fieldRepository.Update(_field);
                 }
 
                 return Updated(feedback);
@@ -236,7 +236,7 @@ namespace SFBMS_API.Controllers
                         TotalRating = GetTotalRating(feedbacks),
                         ImageUrl = field.ImageUrl
                     };
-                    await fieldRepository.Update(field);
+                    await fieldRepository.Update(_field);
                 }
 
                 return NoContent();
