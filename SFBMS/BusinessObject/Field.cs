@@ -40,11 +40,11 @@ namespace BusinessObject
         public double TotalRating { get; set; }
 
         [Column("image_url", TypeName = "nvarchar(max)")]
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
 
         public ICollection<Slot>? Slots { get; set; }
-        [JsonIgnore]
         public ICollection<Feedback>? Feedbacks { get; set; }
+
         [JsonIgnore]
         public ICollection<BookingDetail>? BookingDetails { get; set; }
     }

@@ -122,12 +122,12 @@ namespace SFBMS_API.Controllers
                             {
                                 FieldId = field.Id,
                                 StartTime = start,
-                                EndTime = end.Value,
+                                EndTime = end!.Value,
                                 Status = 0,
                                 SlotNumber = slotNumbers + 1,
                             };
                             await slotRepository.Add(slot);
-                            start = (DateTime)calendarDateAdd.Add(end.Value, interval);
+                            start = (DateTime)calendarDateAdd.Add(end.Value, interval)!;
                             end = calendarDateAdd.Add(start, offset);
                         }
                     }
@@ -138,7 +138,7 @@ namespace SFBMS_API.Controllers
                         {
                             FieldId = field.Id,
                             StartTime = start,
-                            EndTime = end.Value,
+                            EndTime = end!.Value,
                             Status = 0,
                             SlotNumber = slotNumbers + 1,
                         };

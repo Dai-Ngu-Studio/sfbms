@@ -28,9 +28,11 @@ namespace DataAccess
         {
             var db = new SfbmsDbContext();
             IEnumerable<Field>? list = await db.Fields
+                .Include(x => x.Feedbacks)!
+                .ThenInclude(x => x.User)
                 .Include(c => c.Category)
                 .Include(x => x.Slots)
-                .ToListAsync(); ;
+                .ToListAsync();
             return list;
         }
 
@@ -64,6 +66,8 @@ namespace DataAccess
             Field? obj = await db.Fields
                 .Include(c => c.Category)
                 .Include(x => x.Slots)
+                .Include(x => x.Feedbacks)!
+                .ThenInclude(x => x.User)
                 .FirstOrDefaultAsync(x => x.Id == id);
             return obj;
         }
