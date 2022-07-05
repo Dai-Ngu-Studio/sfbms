@@ -81,47 +81,37 @@ namespace SFBMS_API.Controllers
         [HttpPost]
         public async Task<ActionResult<Feedback>> Post(Feedback obj)
         {
-            var field = await fieldRepository.Get(obj.FieldId);
-            if (field == null)
-            {
-                return NotFound("Field not found");
-            }
-
             try
             {
-                int userRating = 0;
-                if (obj.Rating < 0)
+                // Check if field exists
+                var field = await fieldRepository.Get(obj.FieldId);
+                if (field == null)
                 {
-                    userRating = 0;
-                }
-                if (obj.Rating > 5)
-                {
-                    userRating = 5;
+                    return NotFound("Field not found");
                 }
 
-                Feedback feedback = new Feedback
+                // Validate rating
+                int userRating = obj.Rating > 5 ? 5
+                    : obj.Rating < 0 ? 0
+                    : obj.Rating;
+
+                // Create feedback
+                var feedback = new Feedback
                 {
                     UserId = GetCurrentUID(),
                     FieldId = field.Id,
                     Title = obj.Title,
                     Content = obj.Content,
-                    Rating = userRating
+                    Rating = userRating,
+                    FeedbackTime = DateTime.Now
                 };
                 await feedbackRepository.Add(feedback);
 
-                double feedbackCounts = await feedbackRepository.CountFeedbacks(obj.FieldId);
-                List<Feedback> fieldFeedbackList = await feedbackRepository.GetFieldFeedbacks(obj.FieldId);
-
-                if (fieldFeedbackList.Count() > 0)
+                // Update total rating
+                var feedbacks = await feedbackRepository.GetFieldFeedbacks(obj.FieldId);
+                if (feedbacks.Count > 0)
                 {
-                    int ratings = 0;
-                    foreach (var item in fieldFeedbackList)
-                    {
-                        ratings += item.Rating;
-                    }
-                    double totalRating = Math.Round(ratings / feedbackCounts);
-
-                    Field _field = new Field
+                    var _field = new Field
                     {
                         Id = field.Id,
                         Name = field.Name,
@@ -129,10 +119,10 @@ namespace SFBMS_API.Controllers
                         CategoryId = field.CategoryId,
                         Price = field.Price,
                         NumberOfSlots = field.NumberOfSlots,
-                        TotalRating = totalRating,
+                        TotalRating = GetTotalRating(feedbacks),
                         ImageUrl = field.ImageUrl
                     };
-                    await fieldRepository.Update(_field);
+                    await fieldRepository.Update(field);
                 }
 
                 return Created(feedback);
@@ -150,25 +140,53 @@ namespace SFBMS_API.Controllers
         [HttpPut("{key}")]
         public async Task<ActionResult<Feedback>> Put(int key, Feedback obj)
         {
-            var currentFeedback = await feedbackRepository.Get(key);
-            if (currentFeedback == null)
-            {
-                return NotFound("Feedback not found");
-            }
-
             try
             {
+                // Check if feedback exists
+                var currentFeedback = await feedbackRepository.Get(key);
+                if (currentFeedback == null)
+                {
+                    return NotFound("Feedback not found");
+                }
+
+                // Check if field exists
+                var field = await fieldRepository.Get(currentFeedback.FieldId);
+                if (field == null)
+                {
+                    return NotFound("Field not found");
+                }
+
+                // Update feedback
                 Feedback feedback = new Feedback
                 {
                     Id = currentFeedback.Id,
-                    FieldId = obj.FieldId == null ? currentFeedback.FieldId : obj.FieldId,
+                    FieldId = currentFeedback.FieldId,
                     UserId = currentFeedback.UserId,
                     Title = obj.Title == null ? currentFeedback.Title : obj.Title,
                     Content = obj.Content == null ? currentFeedback.Content : obj.Content,
-                    Rating = obj.Rating < 0 ? currentFeedback.Rating : obj.Rating,
+                    Rating = obj.Rating > 5 ? 5 : obj.Rating < 0 ? 0 : obj.Rating,
+                    FeedbackTime = DateTime.Now
                 };
-
                 await feedbackRepository.Update(feedback);
+
+                // Update total rating
+                var feedbacks = await feedbackRepository.GetFieldFeedbacks(obj.FieldId);
+                if (feedbacks.Count > 0)
+                {
+                    var _field = new Field
+                    {
+                        Id = field.Id,
+                        Name = field.Name,
+                        Description = field.Description,
+                        CategoryId = field.CategoryId,
+                        Price = field.Price,
+                        NumberOfSlots = field.NumberOfSlots,
+                        TotalRating = GetTotalRating(feedbacks),
+                        ImageUrl = field.ImageUrl
+                    };
+                    await fieldRepository.Update(field);
+                }
+
                 return Updated(feedback);
             }
             catch
@@ -184,15 +202,43 @@ namespace SFBMS_API.Controllers
         [HttpDelete("{key}")]
         public async Task<ActionResult<Feedback>> Delete(int key)
         {
-            var obj = await feedbackRepository.Get(key);
-            if (obj == null)
-            {
-                return NotFound("Feedback not found");
-            }
-
             try
             {
+                // Check if feedback exists
+                var obj = await feedbackRepository.Get(key);
+                if (obj == null)
+                {
+                    return NotFound("Feedback not found");
+                }
+
+                // Check if field exists
+                var field = await fieldRepository.Get(obj.FieldId);
+                if (field == null)
+                {
+                    return NotFound("Field not found");
+                }
+
+                // Delete feedback
                 await feedbackRepository.Delete(obj);
+
+                // Update total rating
+                var feedbacks = await feedbackRepository.GetFieldFeedbacks(obj.FieldId);
+                if (feedbacks.Count > 0)
+                {
+                    var _field = new Field
+                    {
+                        Id = field.Id,
+                        Name = field.Name,
+                        Description = field.Description,
+                        CategoryId = field.CategoryId,
+                        Price = field.Price,
+                        NumberOfSlots = field.NumberOfSlots,
+                        TotalRating = GetTotalRating(feedbacks),
+                        ImageUrl = field.ImageUrl
+                    };
+                    await fieldRepository.Update(field);
+                }
+
                 return NoContent();
             }
             catch
@@ -207,6 +253,17 @@ namespace SFBMS_API.Controllers
         private string GetCurrentUID()
         {
             return User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        }
+
+        private double GetTotalRating(List<Feedback> feedbacks)
+        {
+            int ratings = 0;
+            foreach (var item in feedbacks)
+            {
+                ratings += item.Rating;
+            }
+            double totalRating = ratings / feedbacks.Count;
+            return totalRating;
         }
     }
 }
