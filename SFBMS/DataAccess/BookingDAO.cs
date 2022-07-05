@@ -39,7 +39,7 @@ namespace DataAccess
         {
             var db = new SfbmsDbContext();
             Booking? obj = await db.Bookings
-                .Include(x => x.BookingDetails).Include(x => x.User)
+                .Include(x => x.BookingDetails)!.ThenInclude(x => x.Field).Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.Id == id && x.UserId == uid);
             return obj;
         }
