@@ -81,8 +81,8 @@ static IEdmModel GetEdmModel()
     modelBuilder.EntitySet<BookingDetail>("BookingDetails").EntityType.HasKey(x => x.Id);
     modelBuilder.EntitySet<Feedback>("Feedbacks").EntityType.HasKey(x => x.Id);
     var field = modelBuilder.EntityType<Field>();
-    field.Action("SlotStatus").ReturnsFromEntitySet<Field>("Fields");
-        //.Parameter<DateTime>("BookingDate");
+    field.Action("SlotStatus").ReturnsFromEntitySet<Field>("Fields")
+        .Parameter<DateTimeOffset>("BookingDate");
     return modelBuilder.GetEdmModel();
 }
 

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Repositories.Interfaces;
+using System.Globalization;
 using System.Security.Claims;
 
 namespace SFBMS_API.Controllers
@@ -53,7 +54,7 @@ namespace SFBMS_API.Controllers
 
         [EnableQuery]
         [HttpPost("{key}/slot-status")]
-        public async Task<ActionResult<Field>> SlotStatus([FromODataUri] int key, DateTime bookingDate)
+        public async Task<ActionResult<Field>> SlotStatus([FromODataUri] int key, ODataActionParameters parameters)
         {
             try
             {
@@ -63,13 +64,17 @@ namespace SFBMS_API.Controllers
                     return NotFound("Field not found");
                 }
 
-                //var bookingDateOffset = (DateTimeOffset)parameters["BookingDate"];
-                //var _bookingDate = bookingDate.DateTime;
-                List<BookingDetail> bookingDetails = (await bookingDetailRepository.GetBookingDetailsForDate(key, bookingDate)).ToList();
+                var bookingDate = (DateTimeOffset)parameters["BookingDate"];
+                //var _bookingDate = DateTime.Parse(bookingDate, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+                List<BookingDetail> bookingDetails = (await bookingDetailRepository.GetBookingDetailsForDate(key, bookingDate.DateTime)).ToList();
 
                 foreach (var slot in obj.Slots!)
                 {
                     slot.BookingStatus = bookingDetails.Any(x => x.StartTime.TimeOfDay == slot.StartTime.TimeOfDay) ? 1 : 0;
+                    slot.StartTime = new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, 
+                        slot.StartTime.Hour, slot.StartTime.Minute, slot.StartTime.Second, slot.StartTime.Millisecond, DateTimeKind.Local);
+                    slot.EndTime = new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day,
+                        slot.EndTime.Hour, slot.EndTime.Minute, slot.StartTime.Second, slot.EndTime.Millisecond, DateTimeKind.Local);
                 }
                 return Ok(obj);
             }
