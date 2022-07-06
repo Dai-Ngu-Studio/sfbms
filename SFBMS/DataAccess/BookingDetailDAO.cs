@@ -124,7 +124,7 @@ namespace DataAccess
             IEnumerable<BookingDetail>? list = await db.BookingDetails
                 .Include(x => x.User)
                 .Include(x => x.Field)
-                .Where(x => x.StartTime.Date == date.Date 
+                .Where(x => x.StartTime.Date <= date.Date 
                 && (x.Status == (int)BookingDetailStatus.NotYet 
                 || x.Status == (int)BookingDetailStatus.Open))
                 .ToListAsync();
