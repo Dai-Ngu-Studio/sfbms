@@ -99,27 +99,30 @@ namespace SFBMS_API.Controllers
 
                 try
                 {
-                    Field field = new Field
+                    if (obj.NumberOfSlots == 8 || obj.NumberOfSlots == 12 || obj.NumberOfSlots == 16 || obj.NumberOfSlots == 18 
+                            || obj.NumberOfSlots == 22 || obj.NumberOfSlots == 24)
                     {
-                        CategoryId = obj.CategoryId,
-                        Name = obj.Name,
-                        Description = obj.Description,
-                        Price = obj.Price < 0 ? 10000 : obj.Price,
-                        NumberOfSlots = obj.NumberOfSlots > 0 || obj.NumberOfSlots < 14 ? obj.NumberOfSlots : 1,
-                        TotalRating = 0,
-                        ImageUrl = obj.ImageUrl
-                    };
+                        Field field = new Field
+                        {
+                            CategoryId = obj.CategoryId,
+                            Name = obj.Name,
+                            Description = obj.Description,
+                            Price = obj.Price < 0 ? 10000 : obj.Price,
+                            NumberOfSlots = obj.NumberOfSlots,
+                            TotalRating = 0,
+                            ImageUrl = obj.ImageUrl
+                        };
+                        await fieldRepository.Add(field);
 
-                    await fieldRepository.Add(field);
+                        int numberOfMinutesPerDay = 1440;
+                        int minutesPerSlot = numberOfMinutesPerDay / obj.NumberOfSlots;
 
-                    CalendarDateAdd calendarDateAdd = new CalendarDateAdd();
-                    DateTime start = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 0, 0, 0);
-                    TimeSpan offset = new TimeSpan(1, 30, 0);
-                    DateTime? end = calendarDateAdd.Add(start, offset);
-                    TimeSpan interval = new TimeSpan(0, 15, 0);
+                        CalendarDateAdd calendarDateAdd = new CalendarDateAdd();
+                        DateTime start = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 0, 0, 0);
+                        TimeSpan offset = TimeSpan.FromMinutes(minutesPerSlot);
+                        DateTime? end = calendarDateAdd.Add(start, offset);
+                        TimeSpan interval = new TimeSpan(0, 0, 0);
 
-                    if (obj.NumberOfSlots > 0 || obj.NumberOfSlots < 14)
-                    {
                         for (int i = 1; i <= obj.NumberOfSlots; i++)
                         {
                             int slotNumbers = await slotRepository.CountFieldSlots(field.Id);
@@ -135,22 +138,9 @@ namespace SFBMS_API.Controllers
                             start = (DateTime)calendarDateAdd.Add(end.Value, interval)!;
                             end = calendarDateAdd.Add(start, offset);
                         }
+                        return Created(field);
                     }
-                    else
-                    {
-                        int slotNumbers = await slotRepository.CountFieldSlots(field.Id);
-                        Slot slot = new Slot
-                        {
-                            FieldId = field.Id,
-                            StartTime = start,
-                            EndTime = end!.Value,
-                            Status = 0,
-                            SlotNumber = slotNumbers + 1,
-                        };
-                        await slotRepository.Add(slot);
-                    }
-
-                    return Created(field);
+                    return BadRequest();
                 }
                 catch
                 {
