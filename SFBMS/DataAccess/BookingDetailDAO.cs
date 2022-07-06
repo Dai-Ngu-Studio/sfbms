@@ -62,7 +62,10 @@ namespace DataAccess
         public async Task<BookingDetail?> GetUserBookingDetail(int? id, string uid)
         {
             var db = new SfbmsDbContext();
-            BookingDetail? obj = await db.BookingDetails.Include(x => x.Field).FirstOrDefaultAsync(x => x.Id == id && x.UserId == uid);
+            BookingDetail? obj = await db.BookingDetails
+                .Include(x => x.Field)
+                .Include(x => x.Feedbacks)
+                .FirstOrDefaultAsync(x => x.Id == id && x.UserId == uid);
             return obj;
         }
 

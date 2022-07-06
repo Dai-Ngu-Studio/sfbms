@@ -103,7 +103,8 @@ namespace SFBMS_API.Controllers
                     Title = obj.Title,
                     Content = obj.Content,
                     Rating = userRating,
-                    FeedbackTime = DateTime.Now
+                    FeedbackTime = DateTime.Now,
+                    BookingDetailId = obj.BookingDetailId
                 };
                 await feedbackRepository.Add(feedback);
 
@@ -162,10 +163,11 @@ namespace SFBMS_API.Controllers
                     Id = currentFeedback.Id,
                     FieldId = currentFeedback.FieldId,
                     UserId = currentFeedback.UserId,
+                    BookingDetailId = currentFeedback.BookingDetailId,
                     Title = obj.Title == null ? currentFeedback.Title : obj.Title,
                     Content = obj.Content == null ? currentFeedback.Content : obj.Content,
                     Rating = obj.Rating > 5 ? 5 : obj.Rating < 0 ? 0 : obj.Rating,
-                    FeedbackTime = DateTime.Now
+                    FeedbackTime = DateTime.Now,
                 };
                 await feedbackRepository.Update(feedback);
 
