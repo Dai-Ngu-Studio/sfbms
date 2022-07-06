@@ -5,6 +5,11 @@ namespace BusinessObject
 {
     public class BookingDetail
     {
+        public BookingDetail()
+        {
+            Feedbacks = new HashSet<Feedback>();
+        }
+
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("id")]
         public int Id { get; set; }
@@ -41,6 +46,8 @@ namespace BusinessObject
 
         [Column("status")]
         public int Status { get; set; }
+
+        public HashSet<Feedback>? Feedbacks { get; set; }
     }
 
     public enum BookingDetailStatus : int
