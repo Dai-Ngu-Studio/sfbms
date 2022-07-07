@@ -36,6 +36,20 @@ namespace DataAccess
             return list;
         }
 
+        public async Task<IEnumerable<Field>> GetListWithCategories(List<int> categoryIds)
+        {
+            var db = new SfbmsDbContext();
+            IEnumerable<Field>? list = await db.Fields
+                .Include(x => x.Feedbacks)!
+                .ThenInclude(x => x.User)
+                .Include(c => c.Category)
+                .Include(x => x.Slots)
+                .Where(x => categoryIds.Contains((int)x.CategoryId!))
+                .Where(x => true)
+                .ToListAsync();
+            return list;
+        }
+
         public async Task<int> GetTotalField(string search)
         {
             try

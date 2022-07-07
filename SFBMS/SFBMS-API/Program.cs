@@ -10,6 +10,7 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OpenApi.Models;
 using Repositories;
 using Repositories.Interfaces;
+using SFBMS_API.Controllers;
 using SFBMS_API.Services;
 using SFBMS_API.Utilities;
 using System.Reflection;
@@ -81,8 +82,15 @@ static IEdmModel GetEdmModel()
     modelBuilder.EntitySet<BookingDetail>("BookingDetails").EntityType.HasKey(x => x.Id);
     modelBuilder.EntitySet<Feedback>("Feedbacks").EntityType.HasKey(x => x.Id);
     var field = modelBuilder.EntityType<Field>();
-    field.Action("SlotStatus").ReturnsFromEntitySet<Field>("Fields")
-        .Parameter<DateTimeOffset>("BookingDate");
+    field.Action(nameof(FieldsController.SlotStatus))
+        .ReturnsFromEntitySet<Field>("Fields")
+        .Parameter<DateTimeOffset>("BookingDate").Optional();
+
+    var fields = modelBuilder.EntityType<Field>().Collection;
+    var filter = fields.Action(nameof(FieldsController.Filter));
+    filter.ReturnsCollectionFromEntitySet<Field>("Fields");
+    filter.CollectionParameter<int>("CategoryIDs").Optional();
+    //filter.CollectionParameter<int>("BookingTimeEnums").Optional();
     return modelBuilder.GetEdmModel();
 }
 

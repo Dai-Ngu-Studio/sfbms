@@ -50,11 +50,11 @@ namespace BusinessObject
         public HashSet<Feedback>? Feedbacks { get; set; }
     }
 
-    public enum BookingDetailStatus : int
+    public enum BookingDetailStatus
     {
-        NotYet = 0,
-        Open = 1,
-        Attended = 2,
-        Absent = 3
+        NotYet,
+        Open,
+        Attended,
+        Absent
     }
 }

@@ -40,6 +40,39 @@ namespace SFBMS_API.Controllers
             return Ok(fieldList);
         }
 
+        [HttpPost("filter")]
+        [EnableQuery(MaxExpansionDepth = 10)]
+        public async Task<ActionResult<List<Field>>> Filter(ODataActionParameters parameters)
+        {
+            try
+            {
+                var fields = new List<Field>();
+                var categoryIds = parameters.ContainsKey("CategoryIDs")
+                    ? ((IEnumerable<int>)parameters["CategoryIDs"]).ToList()
+                    : null;
+                //var bookingTimeEnums = parameters.ContainsKey("BookingTimeEnums")
+                //    ? ((IEnumerable<int>)parameters["BookingTimeEnums"]).ToList()
+                //    : null;
+                fields = (categoryIds != null)
+                    ? (await fieldRepository.GetListWithCategories(categoryIds)).ToList()
+                    : (await fieldRepository.GetList()).ToList();
+                //if (bookingTimeEnums != null)
+                //{
+                //    var bookingTimes = bookingTimeEnums.ConvertAll(
+                //        new Converter<int, DateTime>
+                //        (bookingTimeEnum => Slot.BookingTimes[bookingTimeEnum]));
+                //}
+                return Ok(fields);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.InnerException?.Message);
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
+                return BadRequest();
+            }
+        }
+
         [EnableQuery]
         [HttpGet("{key}")]
         public async Task<ActionResult<Field>> GetField(int key)
@@ -52,7 +85,7 @@ namespace SFBMS_API.Controllers
             return Ok(obj);
         }
 
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 10)]
         [HttpPost("{key}/slot-status")]
         public async Task<ActionResult<Field>> SlotStatus([FromODataUri] int key, ODataActionParameters parameters)
         {
@@ -64,24 +97,24 @@ namespace SFBMS_API.Controllers
                     return NotFound("Field not found");
                 }
 
-                var bookingDate = (DateTimeOffset)parameters["BookingDate"];
-                //var _bookingDate = DateTime.Parse(bookingDate, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+                var bookingDate = parameters.ContainsKey("BookingDate")
+                    ? (DateTimeOffset)parameters["BookingDate"]
+                    : DateTimeOffset.UtcNow;
                 List<BookingDetail> bookingDetails = (await bookingDetailRepository.GetBookingDetailsForDate(key, bookingDate.DateTime)).ToList();
 
                 foreach (var slot in obj.Slots!)
                 {
                     slot.BookingStatus = bookingDetails.Any(x => x.StartTime.TimeOfDay == slot.StartTime.TimeOfDay) ? 1 : 0;
-                    slot.StartTime = new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, 
+                    slot.StartTime = new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day,
                         slot.StartTime.Hour, slot.StartTime.Minute, slot.StartTime.Second, slot.StartTime.Millisecond, DateTimeKind.Local);
                     slot.EndTime = new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day,
                         slot.EndTime.Hour, slot.EndTime.Minute, slot.StartTime.Second, slot.EndTime.Millisecond, DateTimeKind.Local);
                 }
                 return Ok(obj);
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e.Message);
-                return StatusCode(500);
+                return BadRequest();
             }
         }
 
@@ -99,7 +132,7 @@ namespace SFBMS_API.Controllers
 
                 try
                 {
-                    if (obj.NumberOfSlots == 8 || obj.NumberOfSlots == 12 || obj.NumberOfSlots == 16 || obj.NumberOfSlots == 18 
+                    if (obj.NumberOfSlots == 8 || obj.NumberOfSlots == 12 || obj.NumberOfSlots == 16 || obj.NumberOfSlots == 18
                             || obj.NumberOfSlots == 22 || obj.NumberOfSlots == 24)
                     {
                         Field field = new Field
