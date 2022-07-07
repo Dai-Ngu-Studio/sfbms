@@ -37,7 +37,7 @@ namespace BusinessObject
         public int Rating { get; set; }
 
         [Column("feedback_time", TypeName = "datetime2(7)")]
-        public DateTime FeedbackTime { get; set; }
+        public DateTime? FeedbackTime { get; set; }
 
     }
 }
