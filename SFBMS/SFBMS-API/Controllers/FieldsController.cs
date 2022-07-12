@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Repositories.Interfaces;
-using System.Globalization;
 using System.Security.Claims;
 
 namespace SFBMS_API.Controllers
@@ -263,7 +262,7 @@ namespace SFBMS_API.Controllers
         }
         private string GetCurrentUID()
         {
-            return User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
         }
     }
 }

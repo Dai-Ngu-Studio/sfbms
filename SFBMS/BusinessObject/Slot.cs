@@ -24,7 +24,7 @@ namespace BusinessObject
         public DateTime EndTime { get; set; }
 
         [Column("status")]
-        public int Status { get; set; }
+        public int? Status { get; set; }
 
         [Column("slot_number")]
         public int SlotNumber { get; set; }

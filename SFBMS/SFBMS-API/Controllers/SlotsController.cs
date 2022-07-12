@@ -183,7 +183,7 @@ namespace SFBMS_API.Controllers
         }
         private string GetCurrentUID()
         {
-            return User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
         }
     }
 }
